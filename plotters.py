@@ -191,5 +191,42 @@ def power_plot(filename, x_axis, y_axis, marks):
     plt.close(fig)
 
 
+def box_plot(filename, label, data):
+    config = {
+        CfgLabel.ylabel: label,
+        CfgLabel.xlabel: '# Hilos',
+        CfgLabel.title: f'Variation of {label}',
+        CfgLabel.aspect_ratio: 1.0,
+        CfgLabel.dpi: 100,
+        CfgLabel.size: 5,
+        CfgLabel.fname: f'boxplot-{label}-f{filename}'
+    }
+
+    fig, ax = plt.subplots(
+        figsize=(
+            config[CfgLabel.size],
+            config[CfgLabel.size] / config[CfgLabel.aspect_ratio])
+    )
+    ax.set_xlabel(config[CfgLabel.xlabel])
+    ax.set_ylabel(config[CfgLabel.ylabel])
+
+    # ******************** CAMBIAR TAMAÑO TEXTO ********************
+    # ax.axes.title.set_fontsize(25)
+    # ax.xaxis.label.set_fontsize(20)
+    # ax.yaxis.label.set_fontsize(20)
+    #
+    # ticklabels = ax.get_xticklabels()
+    # for item in ticklabels:
+    #     item.set_fontsize(20)
+    #
+    # ticklabels = ax.get_yticklabels()
+    # for item in ticklabels:
+    #     item.set_fontsize(20)
+    # ******************** CAMBIAR TAMAÑO TEXTO ********************
+    ax.boxplot(data.values(), labels=data.keys())
+    plt.savefig(fig)
+    plt.close(fig)
+
+
 if __name__ == '__main__':
     print('This is not meant to be executed')

@@ -17,6 +17,21 @@ logging.basicConfig(
 )
 
 
+class IDs:
+    DEVICE = 'device'
+    TYPE = 'type'
+    OS = 'os'
+    BENCH = 'benchmark'
+    SIZE = 'size'
+    THREADS = 'threads'
+    ITERATION = 'iteration'
+    TIME = 'time'
+    ENERGY = 'joules'
+    MOPS = 'mops'
+    CSV = 'csv'
+    LOG = 'log'
+
+
 # Devices used in testing
 HIKEY970 = 'hikey970'
 ODROIDXU4_A = 'odroidxu4a'
