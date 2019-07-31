@@ -41,13 +41,10 @@ def main():
             idict_time[j] = item[1][item[1][IDs.THREADS] == j][IDs.TIME].values.tolist()
             idict_energy[j] = item[1][item[1][IDs.THREADS] == j][IDs.ENERGY].values.tolist()
             idict_mops[j] = item[1][item[1][IDs.THREADS] == j][IDs.MOPS].values.tolist()
-        print(item[1].head(1))
-        box_plot(f'{cwd}_{"_".join(item[0])}', IDs.TIME, idict_time)
-        box_plot(f'{cwd}_{"_".join(item[0])}', IDs.ENERGY, idict_energy)
-        box_plot(f'{cwd}_{"_".join(item[0])}', IDs.MOPS, idict_mops)
-        bp = item[1].boxplot(figsize=(20, 8), by=[IDs.THREADS], column=[IDs.TIME, IDs.ENERGY, IDs.MOPS])
+        box_plot(cwd, f'{"_".join(item[0])}', IDs.TIME, idict_time)
+        box_plot(cwd, f'{"_".join(item[0])}', IDs.ENERGY, idict_energy)
+        box_plot(cwd, f'{"_".join(item[0])}', IDs.MOPS, idict_mops)
         plt.close()
-
     logger.info(f'[{options.data_file}]')
 
 
