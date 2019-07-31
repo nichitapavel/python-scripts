@@ -191,7 +191,7 @@ def power_plot(filename, x_axis, y_axis, marks):
     plt.close(fig)
 
 
-def box_plot(filename, label, data):
+def box_plot(path, filename, label, data):
     config = {
         CfgLabel.ylabel: label,
         CfgLabel.xlabel: '# Hilos',
@@ -199,7 +199,8 @@ def box_plot(filename, label, data):
         CfgLabel.aspect_ratio: 1.0,
         CfgLabel.dpi: 100,
         CfgLabel.size: 5,
-        CfgLabel.fname: f'boxplot-{label}-f{filename}'
+        CfgLabel.ftype: 'png',
+        CfgLabel.fname: f'{path}/boxplot-{label}_{filename}'
     }
 
     fig, ax = plt.subplots(
@@ -224,7 +225,7 @@ def box_plot(filename, label, data):
     #     item.set_fontsize(20)
     # ******************** CAMBIAR TAMAÑO TEXTO ********************
     ax.boxplot(data.values(), labels=data.keys())
-    plt.savefig(fig)
+    plt.savefig(f'{config[CfgLabel.fname]}.{config[CfgLabel.ftype]}')
     plt.close(fig)
 
 
