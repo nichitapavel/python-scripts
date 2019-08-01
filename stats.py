@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems
 from plotters import box_plot
+import seaborn as sns
 
 
 def parse_args(logger):
@@ -77,6 +78,21 @@ def main():
     box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
     box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
     logger.info(f'[{options.data_file}]')
+
+    df_groups = df.groupby(list(set(DataFilterItems) - set([IDs.DEVICE, IDs.THREADS])))
+    for group in df_groups:
+        name = f'{"_".join(str(x) for x in group[0])}'
+        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.TIME, hue=IDs.THREADS, data=group[1])
+        boxplot.get_figure().savefig(f'{name}_{IDs.TIME}.png')
+        boxplot.get_figure().clf()
+        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.ENERGY, hue=IDs.THREADS, data=group[1])
+        boxplot.get_figure().savefig(f'{name}_{IDs.ENERGY}.png')
+        boxplot.get_figure().clf()
+        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.MOPS, hue=IDs.THREADS, data=group[1])
+        boxplot.get_figure().savefig(f'{name}_{IDs.MOPS}.png')
+        boxplot.get_figure().clf()
+    df = sns.load_dataset('tips')
+    sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
 
 
 if __name__ == "__main__":
