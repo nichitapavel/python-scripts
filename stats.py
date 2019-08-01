@@ -64,6 +64,32 @@ def box_plotting(cwd, df, options, x_axis_groupby):
             plt.close()
 
 
+def groups_plotting(name, data, options, x_group, x_axis):
+    name_time = f'{name}_{IDs.TIME}_{x_axis}_{x_group}.png'
+    logger.info(f'[{options.data_file}][BOXPLOT][{name_time}]')
+    bp = sns.boxplot(x=x_axis, y=IDs.TIME, hue=x_group, data=data)
+    bp.get_figure().savefig(name_time)
+    bp.get_figure().clf()
+    name_energy = f'{name}_{IDs.ENERGY}_{x_axis}_{x_group}.png'
+    logger.info(f'[{options.data_file}][BOXPLOT][{name_energy}]')
+    bp = sns.boxplot(x=x_axis, y=IDs.ENERGY, hue=x_group, data=data)
+    bp.get_figure().savefig(name_energy)
+    bp.get_figure().clf()
+    name_mops = f'{name}_{IDs.MOPS}_{x_axis}_{x_group}.png'
+    logger.info(f'[{options.data_file}][BOXPLOT][{name_mops}]')
+    bp = sns.boxplot(x=x_axis, y=IDs.MOPS, hue=x_group, data=data)
+    bp.get_figure().savefig(name_mops)
+    bp.get_figure().clf()
+
+
+def box_plotting_groups(cwd, df, options, x_axis_groupby):
+    df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
+    for group in df_groups:
+        name = f'{"_".join(str(x) for x in group[0])}'
+        groups_plotting(name, group[1], options, x_axis_groupby[0], x_axis_groupby[1])
+        groups_plotting(name, group[1], options, x_axis_groupby[1], x_axis_groupby[0])
+
+
 def main():
     options = parse_args(logger)
     os.chdir(options.save_directory)
@@ -79,18 +105,9 @@ def main():
     box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
     logger.info(f'[{options.data_file}]')
 
-    df_groups = df.groupby(list(set(DataFilterItems) - set([IDs.DEVICE, IDs.THREADS])))
-    for group in df_groups:
-        name = f'{"_".join(str(x) for x in group[0])}'
-        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.TIME, hue=IDs.THREADS, data=group[1])
-        boxplot.get_figure().savefig(f'{name}_{IDs.TIME}.png')
-        boxplot.get_figure().clf()
-        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.ENERGY, hue=IDs.THREADS, data=group[1])
-        boxplot.get_figure().savefig(f'{name}_{IDs.ENERGY}.png')
-        boxplot.get_figure().clf()
-        boxplot = sns.boxplot(x=IDs.DEVICE, y=IDs.MOPS, hue=IDs.THREADS, data=group[1])
-        boxplot.get_figure().savefig(f'{name}_{IDs.MOPS}.png')
-        boxplot.get_figure().clf()
+    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.DEVICE])
+    box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.DEVICE])
+    box_plotting_groups(cwd, df, options, [IDs.OS, IDs.DEVICE])
     df = sns.load_dataset('tips')
     sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
 
