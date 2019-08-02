@@ -105,9 +105,20 @@ def main():
     box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
     logger.info(f'[{options.data_file}]')
 
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.DEVICE])
-    box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.DEVICE])
-    box_plotting_groups(cwd, df, options, [IDs.OS, IDs.DEVICE])
+    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
+    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
+    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
+    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
+
+    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
+    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
+    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
+
+    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
+    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
+
+    box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
+
     df = sns.load_dataset('tips')
     sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
 
