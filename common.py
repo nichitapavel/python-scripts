@@ -26,13 +26,14 @@ class IDs:
     THREADS = 'threads'
     ITERATION = 'iteration'
     TIME = 'time'
+    TIME_NPB = 'time_npb'
     ENERGY = 'joules'
     MOPS = 'mops'
     CSV = 'csv'
     LOG = 'log'
 
 
-ResultItems = [IDs.TIME, IDs.ENERGY, IDs.MOPS]
+ResultItems = [IDs.TIME, IDs.TIME_NPB, IDs.ENERGY, IDs.MOPS]
 DataFilterItems = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.THREADS]
 
 # Devices used in testing
