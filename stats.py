@@ -92,6 +92,40 @@ def box_plotting_groups(cwd, df, options, x_axis_groupby):
         groups_plotting(name, group[1], options, x_axis_groupby[1], x_axis_groupby[0])
 
 
+def update_dict(stats, data_dict, type_of_data):
+    new_dict = data_dict.copy()
+    for index in stats.index:
+        new_dict.update({
+            index: stats[type_of_data][index]
+        })
+    return new_dict
+
+
+def create_and_write_stats(df):
+    df_groups = df.groupby(DataFilterItems)
+    stats_results = {IDs.TIME: [], IDs.TIME_NPB: [], IDs.ENERGY: [], IDs.MOPS: []}
+    for group in df_groups:
+        data_dict = {
+            IDs.TYPE: group[0][0],
+            IDs.DEVICE: group[0][1],
+            IDs.OS: group[0][2],
+            IDs.BENCH: group[0][3],
+            IDs.THREADS: group[0][4].item()
+        }
+        stats = group[1][ResultItems].agg(['count', 'mean', 'std', 'var', 'mad', 'min', 'max'])
+        stats = stats.append(group[1][ResultItems]
+                             .quantile([0.25, 0.5, 0.75])
+                             .rename(index={0.25: 'q1', 0.5: 'q2_median', 0.75: 'q3'})
+                             )
+        for result in ResultItems:
+            stats_dict = update_dict(stats, data_dict, result)
+            stats_results[result].append(stats_dict)
+    for result in ResultItems:
+        write_csv_list_of_dict(f'stats_{result}.csv', stats_results[result], logger)
+
+    return stats_results
+
+
 def main():
     options = parse_args(logger)
     os.chdir(options.save_directory)
@@ -121,70 +155,7 @@ def main():
 
     box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
 
-    df_groups = df.groupby(DataFilterItems)
-    results_time = []
-    results_time_npb = []
-    results_energy = []
-    results_mops = []
-    for group in df_groups:
-        row = {
-            IDs.TYPE: group[0][0],
-            IDs.DEVICE: group[0][1],
-            IDs.OS: group[0][2],
-            IDs.BENCH: group[0][3],
-            IDs.THREADS: group[0][4].item()
-        }
-        # print(group[1].describe(include=['time', 'time_npb', 'joules', 'mops']))
-        stats = group[1][ResultItems].describe()
-        row.update({
-            'count': stats[IDs.TIME]['count'],
-            'mean': stats[IDs.TIME]['mean'],
-            'std': stats[IDs.TIME]['std'],
-            'min': stats[IDs.TIME]['min'],
-            'max': stats[IDs.TIME]['max'],
-            '25%': stats[IDs.TIME]['25%'],
-            '50%': stats[IDs.TIME]['50%'],
-            '75%': stats[IDs.TIME]['75%']
-        })
-        results_time.append(row)
-        row_energy = row.copy()
-        row_energy.update({
-            'count': stats[IDs.ENERGY]['count'],
-            'mean': stats[IDs.ENERGY]['mean'],
-            'std': stats[IDs.ENERGY]['std'],
-            'min': stats[IDs.ENERGY]['min'],
-            'max': stats[IDs.ENERGY]['max'],
-            '25%': stats[IDs.ENERGY]['25%'],
-            '50%': stats[IDs.ENERGY]['50%'],
-            '75%': stats[IDs.ENERGY]['75%']
-        })
-        results_energy.append(row_energy)
-        row_time_npb = row.copy()
-        row.update({
-            'count': stats[IDs.TIME_NPB]['count'],
-            'mean': stats[IDs.TIME_NPB]['mean'],
-            'std': stats[IDs.TIME_NPB]['std'],
-            'min': stats[IDs.TIME_NPB]['min'],
-            'max': stats[IDs.TIME_NPB]['max'],
-            '25%': stats[IDs.TIME_NPB]['25%'],
-            '50%': stats[IDs.TIME_NPB]['50%'],
-            '75%': stats[IDs.TIME_NPB]['75%']
-        })
-        results_time_npb.append(results_time_npb)
-        row_mops = row.copy()
-        row.update({
-            'count': stats[IDs.MOPS]['count'],
-            'mean': stats[IDs.MOPS]['mean'],
-            'std': stats[IDs.MOPS]['std'],
-            'min': stats[IDs.MOPS]['min'],
-            'max': stats[IDs.MOPS]['max'],
-            '25%': stats[IDs.MOPS]['25%'],
-            '50%': stats[IDs.MOPS]['50%'],
-            '75%': stats[IDs.MOPS]['75%']
-        })
-        results_mops.append(row_mops)
-        print(group[0])
-        print(stats)
+    stats = create_and_write_stats(df)
 
     # df = sns.load_dataset('tips')
     # sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
