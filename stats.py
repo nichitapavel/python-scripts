@@ -2,11 +2,13 @@ import logging
 import os
 import sys
 from optparse import OptionParser
+
 import matplotlib.pyplot as plt
 import pandas as pd
-from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems
-from plotters import box_plot
 import seaborn as sns
+
+from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict
+from plotters import box_plot
 
 
 def parse_args(logger):
