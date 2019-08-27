@@ -212,9 +212,11 @@ def write_csv_dict_with_lists(filename, csv_data):
             writer.writerow(data_dict)
 
 
-def write_csv_list_of_dict(filename, csv_data, logger):
+def write_csv_list_of_dict(filename, csv_data, logger, overwrite=False):
     try:
-        if os.access(filename, os.F_OK):
+        if overwrite:
+            open_mode = 'w'
+        elif os.access(filename, os.F_OK):
             open_mode = 'a'
         else:
             open_mode = 'w'
