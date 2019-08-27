@@ -77,7 +77,7 @@ def main():
         merged_data.append(mlp_item)
 
     sort_list_of_dict(merged_data)
-    write_csv_list_of_dict('merge_data.csv', merged_data, logger)
+    write_csv_list_of_dict('merge_data.csv', merged_data, logger, overwrite=True)
 
 
 if __name__ == "__main__":
