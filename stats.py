@@ -4,6 +4,7 @@ import sys
 from optparse import OptionParser
 
 import matplotlib.pyplot as plt
+import numpy
 import pandas as pd
 import seaborn as sns
 
@@ -37,6 +38,45 @@ def clean_data(df):
     for item in ResultItems:
         df = df[df[item] != 0]
     return df
+
+
+def set_data_labels(cp):
+    bars = cp.ax.patches
+    for bar in bars:
+        bar_width = bar.get_width()
+        text_x = bar_width / 2 + bar.get_x()
+        bar_height = bar.get_height()
+        if not numpy.isnan(bar_height):
+            text_y = bar_height + bar_height * 0.01
+            cp.ax.text(x=text_x, y=text_y, s=f'{bar_height:.2f}', ha='center')
+
+
+def cat_plotting(cwd, df, options, x_axis_groupby, type):
+    df_groups = df.groupby(list(set(DataFilterItems) - set([x_axis_groupby])))
+    values = ['mean', 'q2_median']
+    for value in values:
+        for group in df_groups:
+            name = f'catplot_{value}_{type}_{x_axis_groupby}_{"_".join(str(x) for x in group[0])}'
+            cp = sns.catplot(x=IDs.THREADS, y=value, data=group[1], height=6, kind="bar", palette="muted")
+            set_data_labels(cp)
+            cp.savefig(name)
+            cp.fig.clf()
+            plt.close()
+            logger.info(f'[{options.data_file}][CATPLOT][{name}]')
+
+
+def cat_plotting_group(cwd, df, options, x_axis_groupby, type):
+    df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
+    values = ['mean', 'q2_median']
+    for value in values:
+        for group in df_groups:
+            name = f'catplot_{value}_{type}_{"_".join(x_axis_groupby)}_{"_".join(str(x) for x in group[0])}'
+            cp = sns.catplot(x=IDs.THREADS, y=value, hue=x_axis_groupby[1], data=group[1], height=6, kind="bar", palette="muted")
+            set_data_labels(cp)
+            cp.savefig(name)
+            cp.fig.clf()
+            plt.close()
+            logger.info(f'[{options.data_file}][CATPLOT][HUE][{name}]')
 
 
 def box_plotting(cwd, df, options, x_axis_groupby):
