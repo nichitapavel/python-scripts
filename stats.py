@@ -48,7 +48,7 @@ def set_data_labels(cp):
         bar_height = bar.get_height()
         if not numpy.isnan(bar_height):
             text_y = bar_height + bar_height * 0.01
-            cp.ax.text(x=text_x, y=text_y, s=f'{bar_height:.2f}', ha='center')
+            cp.ax.text(x=text_x, y=text_y, s=f'{bar_height:.2f}', ha='center', fontsize=9)
 
 
 def cat_plotting(cwd, df, options, x_axis_groupby, type):
