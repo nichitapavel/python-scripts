@@ -200,7 +200,7 @@ def main():
         pd_stats = pd.DataFrame(stats[resultItem])
         cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
         cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
-        cat_plotting_group(cwd, pd_stats[resultItem], options, [IDs.THREADS, IDs.TYPE], resultItem)
+        cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
 
     # df = sns.load_dataset('tips')
     # sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
