@@ -244,7 +244,7 @@ def parse_args(logger):
     parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option('-d', '--directory', action='store', type='string', dest='directory')
     parser.add_option('-c', '--cores', action='store', type='int', dest='cores')
-    parser.add_option('-s', '--starts-with', action='store', type='string', dest='starts_with', default='data')
+    parser.add_option('-s', '--starts-with', action='store', type='string', dest='starts_with')
     (options, args) = parser.parse_args()
     if not options.directory:
         # This logger line will not be saved to file

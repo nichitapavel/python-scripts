@@ -169,8 +169,12 @@ def get_files(filter):
     files = os.listdir(os.curdir)
     size_file = []
     for filename in files:
-        if filename.startswith(filter) and filename.endswith('.csv'):
-            if f'transformed-{filename}' not in files:
+        if filename.endswith('.csv') and f'transformed-{filename}' not in files:
+            if filter is not None:
+                if filename.startswith(filter):
+                    size = os.path.getsize(filename)
+                    size_file.append((size, filename))
+            else:
                 size = os.path.getsize(filename)
                 size_file.append((size, filename))
     size_file.sort(key=lambda s: s[0], reverse=True)
