@@ -57,6 +57,8 @@ def block_process(i: int, lines: list, name_parsed: dict) -> 'int,dict':
     # an IndexError. No more available lines to process.
     try:
         while 'Run:' not in lines[i]:
+            if 'Class' in lines[i]:
+                metric_dict['size'] = lines[i].split()[3].lower()
             if 'Time in ' in lines[i]:
                 time_npb = float(lines[i].split()[5])
             elif 'Mops ' in lines[i]:
