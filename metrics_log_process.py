@@ -80,7 +80,7 @@ def get_files(filter):
     files = os.listdir(os.curdir)
     files_ret = []
     for filename in files:
-        if filename.endswith('.log') and f'read-{filename}' not in files:
+        if filename.endswith('.log') and f'read-{filename}' not in files and filename != 'metrics.log':
             if filter is not None:
                 if filename.startswith(filter):
                     files_ret.append(filename)
