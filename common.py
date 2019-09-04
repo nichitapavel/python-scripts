@@ -17,6 +17,25 @@ logging.basicConfig(
 )
 
 
+class IDs:
+    DEVICE = 'device'
+    TYPE = 'type'
+    OS = 'os'
+    BENCH = 'benchmark'
+    SIZE = 'size'
+    THREADS = 'threads'
+    ITERATION = 'iteration'
+    TIME = 'time'
+    TIME_NPB = 'time_npb'
+    ENERGY = 'joules'
+    MOPS = 'mops'
+    CSV = 'csv'
+    LOG = 'log'
+
+
+ResultItems = [IDs.TIME, IDs.TIME_NPB, IDs.ENERGY, IDs.MOPS]
+DataFilterItems = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.THREADS]
+
 # Devices used in testing
 HIKEY970 = 'hikey970'
 ODROIDXU4_A = 'odroidxu4a'
@@ -51,6 +70,7 @@ CSV_OP = 'Operation'
 def csv_name_parsing(filename):
     csv_row = {}
     parts = filename.split('.')
+
     if parts[-1] == 'csv':
         parts_csv = parts[-2].split('_')
         csv_row = {}
