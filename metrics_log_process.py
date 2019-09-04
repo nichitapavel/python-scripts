@@ -110,7 +110,12 @@ def get_files(filter):
     files = os.listdir(os.curdir)
     files_ret = []
     for filename in files:
-        if filename.endswith('.log') and f'read-{filename}' not in files and filename != 'metrics.log':
+        # Basically, dont call your data files metrics.log or start names with 'read-',
+        # is used as a meta cache system.
+        if filename.endswith('.log') and \
+                f'read-{filename}' not in files and \
+                filename != 'metrics.log' and \
+                not filename.startswith('read-'):
             if filter is not None:
                 if filename.startswith(filter):
                     files_ret.append(filename)
