@@ -90,14 +90,14 @@ def block_process_size(i: int, lines: list, name_parsed: dict) -> 'int,dict':
                 mops = float(lines[i].split()[4])
             # While in 'Run: n' block we must go to the next line
             i += 1
-        # Check if there is no npb data
-        if metric_dict['size'] is None:
-            metric_dict['size'] = size
         # We are at the line with 'Run: n+1', we must set the position to the previous
         # line so that outer function can read it and launch this function again
         i -= 1
     except IndexError:
         pass
+    # Check if there is no npb data
+    if metric_dict['size'] is None:
+        metric_dict['size'] = size
     metric_dict.update({'time_npb': time_npb, 'mops': mops})
     return i, metric_dict
 
