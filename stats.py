@@ -112,18 +112,24 @@ def box_plotting(cwd, df, options, x_axis_groupby):
     :return:
     """
     df_groups = df.groupby(list(set(DataFilterItems) - set([x_axis_groupby])))
-    for group in df_groups:
-        unique = group[1][x_axis_groupby].drop_duplicates()
-        dicts = {}
-        for i in ResultItems:
-            dicts[i] = {}
-            for j in unique:
-                dicts[i][j] = group[1][group[1][x_axis_groupby] == j][i].values.tolist()
-        for keys, values in dicts.items():
-            name = f'{x_axis_groupby}_{"_".join(str(x) for x in group[0])}'
-            box_plot(cwd, name, keys, values)
-            logger.info(f'[{options.data_file}][BOXPLOT][{name}]')
-            plt.close()
+    with Pool(8) as p:
+        results = [p.apply_async(boxplot_for_parallel, (cwd, group, options, x_axis_groupby)) for group in df_groups]
+        for result in results:
+            result.get()
+
+
+def boxplot_for_parallel(cwd, group, options, x_axis_groupby):
+    unique = group[1][x_axis_groupby].drop_duplicates()
+    dicts = {}
+    for i in ResultItems:
+        dicts[i] = {}
+        for j in unique:
+            dicts[i][j] = group[1][group[1][x_axis_groupby] == j][i].values.tolist()
+    for keys, values in dicts.items():
+        name = f'{x_axis_groupby}_{"_".join(str(x) for x in group[0])}'
+        box_plot(cwd, name, keys, values)
+        logger.info(f'[{options.data_file}][BOXPLOT][{name}]')
+        plt.close()
 
 
 def groups_plotting(name, data, options, x_group, x_axis):
