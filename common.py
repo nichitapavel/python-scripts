@@ -34,7 +34,7 @@ class IDs:
 
 
 ResultItems = [IDs.TIME, IDs.TIME_NPB, IDs.ENERGY, IDs.MOPS]
-DataFilterItems = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.THREADS]
+DataFilterItems = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.SIZE, IDs.THREADS]
 
 # Devices used in testing
 HIKEY970 = 'hikey970'
