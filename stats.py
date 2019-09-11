@@ -82,7 +82,7 @@ def cat_plotting_group(cwd, df, options, x_axis_groupby, type):
     values = ['mean', 'q2_median']
     with Pool(CORES) as p:
         results = [p.apply_async(
-            catplot_for_parallel, (df_groups, options, type, value, x_axis_groupby)
+            catplot_group_for_parallel, (df_groups, options, type, value, x_axis_groupby)
         ) for value in values]
         for result in results:
             result.get()
