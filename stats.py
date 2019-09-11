@@ -18,6 +18,7 @@ def parse_args(logger):
     parser = OptionParser("usage: %prog -d|--directory DIRECTORY")
     parser.add_option("--df", "--data-file", action="store", type="string", dest="data_file")
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")
+    parser.add_option("--only-stats", action="store_true", dest="only_stats")
     (options, args) = parser.parse_args()
     if not options.data_file or \
             not options.save_directory:
@@ -210,33 +211,34 @@ def main():
 
     df = pd.read_csv(options.data_file)
     df = clean_data(df)
-
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.THREADS)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
-    logger.info(f'[{options.data_file}]')
-
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
-
     stats = create_and_write_stats(df)
-    for resultItem in ResultItems:
-        pd_stats = pd.DataFrame(stats[resultItem])
-        cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
-        cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
-        cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
+
+    if not options.only_stats:
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.THREADS)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
+        logger.info(f'[{options.data_file}]')
+
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
+
+        for resultItem in ResultItems:
+            pd_stats = pd.DataFrame(stats[resultItem])
+            cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
+            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
+            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
 
     # df = sns.load_dataset('tips')
     # sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
