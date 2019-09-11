@@ -34,7 +34,10 @@ def clean_data(df):
     :return: DataFrame without Null (empty) or 0.0 values
     """
     df = df.dropna()
-    df = df[df[IDs.ITERATION] > 10]
+    df = df[df[IDs.ITERATION] > 10]  # Remove the warmup = first 10 iterations
+    # Remove data that has a more than 1% difference between npb reported time and
+    # time calculated from power metric files
+    df = df[df['time_npb'] / df['time'] > 0.99]
     for item in ResultItems:
         df = df[df[item] != 0]
     return df
