@@ -131,10 +131,16 @@ def groups_plotting(name, data, options, x_group, x_axis):
 
 def box_plotting_groups(cwd, df, options, x_axis_groupby):
     df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
-    for group in df_groups:
-        name = f'{"_".join(str(x) for x in group[0])}'
-        groups_plotting(name, group[1], options, x_axis_groupby[0], x_axis_groupby[1])
-        groups_plotting(name, group[1], options, x_axis_groupby[1], x_axis_groupby[0])
+    with Pool(8) as p:
+        results = [p.apply_async(boxplot_group_for_parallel, (group, options, x_axis_groupby)) for group in df_groups]
+        for result in results:
+            result.get()
+
+
+def boxplot_group_for_parallel(group, options, x_axis_groupby):
+    name = f'{"_".join(str(x) for x in group[0])}'
+    groups_plotting(name, group[1], options, x_axis_groupby[0], x_axis_groupby[1])
+    groups_plotting(name, group[1], options, x_axis_groupby[1], x_axis_groupby[0])
 
 
 def update_dict(stats, data_dict, type_of_data):
