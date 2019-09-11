@@ -155,7 +155,8 @@ def create_and_write_stats(df):
             IDs.DEVICE: group[0][1],
             IDs.OS: group[0][2],
             IDs.BENCH: group[0][3],
-            IDs.THREADS: group[0][4].item()
+            IDs.SIZE: group[0][4],
+            IDs.THREADS: group[0][5].item()
         }
         stats = group[1][ResultItems].agg(['count', 'mean', 'std', 'var', 'mad', 'min', 'max'])
         stats = stats.append(group[1][ResultItems]
