@@ -77,17 +77,26 @@ def catplot_for_parallel(df_groups, options, type, value, x_axis_groupby):
 def cat_plotting_group(cwd, df, options, x_axis_groupby, type):
     df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
     values = ['mean', 'q2_median']
-    for value in values:
-        for group in df_groups:
-            name = f'catplot_{value}_{type}_{"_".join(x_axis_groupby)}_{"_".join(str(x) for x in group[0])}'
-            title = f'{type}_{"_".join(group[0])}'
-            cp = sns.catplot(x=IDs.THREADS, y=value, hue=x_axis_groupby[1], data=group[1], height=6, kind="bar", palette="muted")
-            set_data_labels(cp)
-            cp.ax.set_title(title)
-            cp.savefig(name)
-            cp.fig.clf()
-            plt.close()
-            logger.info(f'[{options.data_file}][CATPLOT][HUE][{name}]')
+    with Pool(8) as p:
+        results = [p.apply_async(
+            catplot_for_parallel, (df_groups, options, type, value, x_axis_groupby)
+        ) for value in values]
+        for result in results:
+            result.get()
+
+
+def catplot_group_for_parallel(df_groups, options, type, value, x_axis_groupby):
+    for group in df_groups:
+        name = f'catplot_{value}_{type}_{"_".join(x_axis_groupby)}_{"_".join(str(x) for x in group[0])}'
+        title = f'{type}_{"_".join(group[0])}'
+        cp = sns.catplot(x=IDs.THREADS, y=value, hue=x_axis_groupby[1], data=group[1], height=6, kind="bar",
+                         palette="muted")
+        set_data_labels(cp)
+        cp.ax.set_title(title)
+        cp.savefig(name)
+        cp.fig.clf()
+        plt.close()
+        logger.info(f'[{options.data_file}][CATPLOT][HUE][{name}]')
 
 
 def box_plotting(cwd, df, options, x_axis_groupby):
