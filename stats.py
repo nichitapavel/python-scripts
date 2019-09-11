@@ -9,7 +9,7 @@ import numpy
 import pandas as pd
 import seaborn as sns
 
-from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict
+from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
 from plotters import box_plot
 
 
@@ -55,7 +55,7 @@ def set_data_labels(cp):
 def cat_plotting(cwd, df, options, x_axis_groupby, type):
     df_groups = df.groupby(list(set(DataFilterItems) - set([x_axis_groupby])))
     values = ['mean', 'q2_median']
-    with Pool(8) as p:
+    with Pool(CORES) as p:
         results = [p.apply_async(
             catplot_for_parallel, (df_groups, options, type, value, x_axis_groupby)
         ) for value in values]
@@ -77,7 +77,7 @@ def catplot_for_parallel(df_groups, options, type, value, x_axis_groupby):
 def cat_plotting_group(cwd, df, options, x_axis_groupby, type):
     df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
     values = ['mean', 'q2_median']
-    with Pool(8) as p:
+    with Pool(CORES) as p:
         results = [p.apply_async(
             catplot_for_parallel, (df_groups, options, type, value, x_axis_groupby)
         ) for value in values]
@@ -112,7 +112,7 @@ def box_plotting(cwd, df, options, x_axis_groupby):
     :return:
     """
     df_groups = df.groupby(list(set(DataFilterItems) - set([x_axis_groupby])))
-    with Pool(8) as p:
+    with Pool(CORES) as p:
         results = [p.apply_async(boxplot_for_parallel, (cwd, group, options, x_axis_groupby)) for group in df_groups]
         for result in results:
             result.get()
@@ -152,7 +152,7 @@ def groups_plotting(name, data, options, x_group, x_axis):
 
 def box_plotting_groups(cwd, df, options, x_axis_groupby):
     df_groups = df.groupby(list(set(DataFilterItems) - set(x_axis_groupby)))
-    with Pool(8) as p:
+    with Pool(CORES) as p:
         results = [p.apply_async(boxplot_group_for_parallel, (group, options, x_axis_groupby)) for group in df_groups]
         for result in results:
             result.get()

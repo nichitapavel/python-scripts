@@ -1,6 +1,7 @@
 import csv
 import datetime
 import logging
+import multiprocessing
 import os
 import sys
 from optparse import OptionParser
@@ -54,6 +55,9 @@ TS_FORMAT = [
 CSV_TIME = 'Time'
 CSV_POWER = 'Power(mWatt)'
 CSV_OP = 'Operation'
+
+# Cores
+CORES = multiprocessing.cpu_count()
 
 
 # Files naming scheme:
