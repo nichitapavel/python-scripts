@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from optparse import OptionParser
+import pandas as pd
 
 from common import write_csv_list_of_dict, parse_args, sort_list_of_dict
 
@@ -46,6 +47,11 @@ def main():
         mlp_data = [d for d in reader]
 
     os.chdir(options.save_directory)
+
+    data_file = pd.read_csv(options.data_file)
+    metrics_files = pd.read_csv(options.metrics_file)
+    merged_data = metrics_files.merge(right=data_file, how='inner', sort=True, validate='one_to_one')
+    merged_data.to_csv(path_or_buf='merge_data_pd.csv', index=False)
 
     merged_data = []
     i = 0
