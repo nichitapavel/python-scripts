@@ -236,7 +236,7 @@ def write_csv_list_of_dict(filename, csv_data, logger, overwrite=False):
 
 def parse_args(logger):
     # Parsear linea de comandos
-    parser = OptionParser('usage: %prog -d|--directory DIRECTORY')
+    parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option('-d', '--directory', action='store', type='string', dest='directory')
     parser.add_option('-c', '--cores', action='store', type='int', dest='cores')
     parser.add_option('-s', '--starts-with', action='store', type='string', dest='starts_with', default='data')

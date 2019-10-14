@@ -16,7 +16,7 @@ logging.basicConfig(
 
 def parse_args(logger):
     # Parsear linea de comandos
-    parser = OptionParser("usage: %prog -d|--directory DIRECTORY")
+    parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("--df", "--data-file", action="store", type="string", dest="data_file")
     parser.add_option("--mf", "--metrics-file", action="store", type="string", dest="metrics_file")
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")

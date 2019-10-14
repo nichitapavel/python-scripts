@@ -15,7 +15,7 @@ from plotters import box_plot
 
 def parse_args(logger):
     # Parsear linea de comandos
-    parser = OptionParser("usage: %prog -d|--directory DIRECTORY")
+    parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("--df", "--data-file", action="store", type="string", dest="data_file")
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")
     parser.add_option("--only-stats", action="store_true", dest="only_stats")
