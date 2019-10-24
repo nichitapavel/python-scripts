@@ -5,7 +5,7 @@ import sys
 from optparse import OptionParser
 import pandas as pd
 
-from common import write_csv_list_of_dict, parse_args, sort_list_of_dict
+from common import write_csv_list_of_dict, parse_args, sort_list_of_dict, DataFilterItems, IDs
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,11 +48,6 @@ def main():
 
     os.chdir(options.save_directory)
 
-    data_file = pd.read_csv(options.data_file)
-    metrics_files = pd.read_csv(options.metrics_file)
-    merged_data = metrics_files.merge(right=data_file, how='inner', sort=True, validate='one_to_one')
-    merged_data.to_csv(path_or_buf='merge_data_pd.csv', index=False)
-
     merged_data = []
     i = 0
     while i < len(dcp_data):
@@ -84,6 +79,24 @@ def main():
 
     sort_list_of_dict(merged_data)
     write_csv_list_of_dict('merge_data.csv', merged_data, logger, overwrite=True)
+
+
+def merge_pd(data_file: str, metrics_file: str):
+    try:
+        data_csv = pd.read_csv(data_file)
+        metrics_csv = pd.read_csv(metrics_file)
+        merge_on = DataFilterItems.copy()
+        merge_on.append(IDs.ITERATION)
+        merged_data = data_csv.merge(
+            metrics_csv,
+            on=merge_on,
+            sort=True, how='outer'
+        )
+        # merged_data = metrics_csv.merge(right=data_csv, how='inner', sort=True, validate='one_to_one')
+        merged_data.to_csv(path_or_buf='merge_data_pd.csv', index=False)
+        return merged_data
+    except Exception:
+        return False
 
 
 if __name__ == "__main__":
