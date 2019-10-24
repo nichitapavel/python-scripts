@@ -1,9 +1,11 @@
 import datetime
 
+import pandas as pd
 import pytest
 
 from common import read_timestamp, csv_name_parsing, set_cores
 from custom_exceptions import UnsupportedNumberOfCores
+from merge import merge_pd
 
 
 @pytest.mark.parametrize(
@@ -91,3 +93,13 @@ def test_set_cores(req_cores, expected):
 def test_set_cores_exception(req_cores):
     with pytest.raises(UnsupportedNumberOfCores):
         set_cores(req_cores)
+
+
+def test_merge_pd(request):
+    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
+    expected.reset_index(drop=True, inplace=True)
+    data_1 = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
+    data_2 = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
+    result = merge_pd(data_1, data_2)
+    assert expected.equals(result)
