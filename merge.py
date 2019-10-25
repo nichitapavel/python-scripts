@@ -100,12 +100,7 @@ def merge_pd(data_file: str, metrics_file: str):
         metrics_csv = pd.read_csv(metrics_file)
         merge_on = DataFilterItems.copy()
         merge_on.append(IDs.ITERATION)
-        merged_data = data_csv.merge(
-            metrics_csv,
-            on=merge_on,
-            sort=True, how='outer'
-        )
-        # merged_data = metrics_csv.merge(right=data_csv, how='inner', sort=True, validate='one_to_one')
+        merged_data = data_csv.merge(metrics_csv, on=merge_on, sort=True, how='outer')
         merged_data.to_csv(path_or_buf='merge_data_pd.csv', index=False)
         return merged_data
     except Exception:
