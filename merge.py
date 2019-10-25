@@ -32,7 +32,7 @@ def parse_args(logger):
     return options
 
 
-def read_csv_to_dic(csv_file: str) -> 'list,list':
+def read_csv_to_dict(csv_file: str) -> 'list,list':
     """
     Read a csv file and transform it into a OrderDict
     :param csv_file: string with the path of file to read (including file name)

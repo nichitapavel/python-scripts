@@ -6,7 +6,7 @@ import pytest
 
 from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd, read_csv_to_dic
+from merge import merge_pd, read_csv_to_dict
 
 
 @pytest.mark.parametrize(
@@ -119,6 +119,6 @@ def test_read_csv_to_dict(request):
             IDs.THREADS: '2', IDs.ITERATION: '001', IDs.ENERGY: '83.678068716', IDs.TIME: '11.2442'
         })
     ]
-    keys, data = read_csv_to_dic(f'{request.config.rootdir}/tests/resources/read_csv_to_dict.csv')
-    assert keys == expected_keys
-    assert data == expected_data
+    keys, data = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/cm_read_csv_to_dict.csv')
+    assert expected_keys == keys
+    assert expected_data == data
