@@ -2,7 +2,9 @@ import csv
 import logging
 import os
 import sys
+from collections import OrderedDict
 from optparse import OptionParser
+
 import pandas as pd
 
 from common import write_csv_list_of_dict, parse_args, sort_list_of_dict, DataFilterItems, IDs
@@ -75,6 +77,48 @@ def merge_on_intersect_dicts(data: list, metrics: list) -> list:
                 j -= 1
             j += 1
         i += 1
+    return merged_data
+
+
+def append_data(data: list, diff: list, merged_data: list):
+    """
+    Appends to 'merged_data' rows from 'data' updated with empty valued fields from 'diff'.
+    Follows keys order from 'merged_data'.
+    :param data: list of OrderedDicts
+    :param diff: list of keys present in 'merged_data' but not in 'data'
+    :param merged_data: list of OrderedDicts
+    :return:
+    """
+    for item in data:
+        item.update({x: '' for x in diff})
+        # Follow keys order of 'merged_data'
+        or_dict = OrderedDict()
+        for k in merged_data[0].keys():
+            or_dict[k] = item[k]
+        merged_data.append(or_dict)
+
+
+def merge_dicts(data: str, metrics: str):
+    """
+    Reads two csv files, merges data on equal values using intersected fields,
+    add fields from first to second and vice-versa,  adds empty valued fields
+    to data rows not present in one of the csv's and adds these updated rows
+    to merged data. Finally alphabetically sorts the merged data and saved it
+    to 'merged_data.csv' file in 'directory'
+    :param data: csv file with processed data from energy files
+    :param metrics: csv file with metrics from log file
+    :param directory: string with path where to save the merged csv file
+    :return:
+    """
+    data_keys, data_csv = read_csv_to_dict(data)
+    metrics_keys, metrics_csv = read_csv_to_dict(metrics)
+    merged_data = merge_on_intersect_dicts(metrics=metrics_csv, data=data_csv)
+    merged_keys = list(set(data_keys) | set(metrics_keys))
+    diff = list(set(merged_keys) - set(metrics_keys))
+    append_data(metrics_csv, diff, merged_data)
+    diff = list(set(merged_keys) - set(data_keys))
+    append_data(data_csv, diff, merged_data)
+    sort_list_of_dict(merged_data)
     return merged_data
 
 

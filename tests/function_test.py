@@ -4,9 +4,9 @@ import datetime
 import pandas as pd
 import pytest
 
-from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems
+from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems, sort_list_of_dict
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts
+from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts
 
 
 @pytest.mark.parametrize(
@@ -129,4 +129,13 @@ def test_merge_on_intersect_dicts(request):
     null, metrics_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv')
     null, data_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_processed_data.csv')
     result = merge_on_intersect_dicts(metrics=metrics_csv, data=data_csv)
+    assert expected == result
+
+
+def test_merge_dicts(request):
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    sort_list_of_dict(expected)
+    data_csv = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
+    metrics_csv = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
+    result = merge_dicts(data=data_csv, metrics=metrics_csv)
     assert expected == result
