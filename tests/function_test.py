@@ -1,11 +1,12 @@
+from collections import OrderedDict
 import datetime
 
 import pandas as pd
 import pytest
 
-from common import read_timestamp, csv_name_parsing, set_cores
+from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd
+from merge import merge_pd, read_csv_to_dic
 
 
 @pytest.mark.parametrize(
@@ -103,3 +104,21 @@ def test_merge_pd(request):
     data_2 = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
     result = merge_pd(data_1, data_2)
     assert expected.equals(result)
+
+
+def test_read_csv_to_dict(request):
+    expected_keys = DataFilterItems.copy()
+    expected_keys.extend([IDs.ITERATION, IDs.ENERGY, IDs.TIME])
+    expected_data = [
+        OrderedDict({
+            IDs.TYPE: 'release', IDs.DEVICE: 'hikey970', IDs.OS: 'android', IDs.BENCH: 'bt', IDs.SIZE: 'w',
+            IDs.THREADS: '1', IDs.ITERATION: '001', IDs.ENERGY: '911.300707424', IDs.TIME: '132.6846'
+        }),
+        OrderedDict({
+            IDs.TYPE: 'debug', IDs.DEVICE: 'hikey970', IDs.OS: 'android', IDs.BENCH: 'is', IDs.SIZE: 'b',
+            IDs.THREADS: '2', IDs.ITERATION: '001', IDs.ENERGY: '83.678068716', IDs.TIME: '11.2442'
+        })
+    ]
+    keys, data = read_csv_to_dic(f'{request.config.rootdir}/tests/resources/read_csv_to_dict.csv')
+    assert keys == expected_keys
+    assert data == expected_data

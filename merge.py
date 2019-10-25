@@ -32,6 +32,19 @@ def parse_args(logger):
     return options
 
 
+def read_csv_to_dic(csv_file: str) -> 'list,list':
+    """
+    Read a csv file and transform it into a OrderDict
+    :param csv_file: string with the path of file to read (including file name)
+    :return: A list of keys (header of csv), A list of OrderedDict (data of csv)
+    """
+    with open(csv_file, 'r') as f:
+        reader = csv.DictReader(f)
+        keys = reader.fieldnames
+        data = [d for d in reader]
+    return keys, data
+
+
 def main():
     # options = parse_args(logger)
     options = parse_args(logger)
