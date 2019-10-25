@@ -6,7 +6,7 @@ import pytest
 
 from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd, read_csv_to_dict
+from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts
 
 
 @pytest.mark.parametrize(
@@ -122,3 +122,11 @@ def test_read_csv_to_dict(request):
     keys, data = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/cm_read_csv_to_dict.csv')
     assert expected_keys == keys
     assert expected_data == data
+
+
+def test_merge_on_intersect_dicts(request):
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/cm_merged_data.csv')
+    null, metrics_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv')
+    null, data_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_processed_data.csv')
+    result = merge_on_intersect_dicts(metrics=metrics_csv, data=data_csv)
+    assert expected == result

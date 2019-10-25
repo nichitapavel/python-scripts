@@ -45,6 +45,39 @@ def read_csv_to_dict(csv_file: str) -> 'list,list':
     return keys, data
 
 
+def merge_on_intersect_dicts(data: list, metrics: list) -> list:
+    """
+    Merges two dicts into one using the common elements, returns the new list of OrderedDict
+    Rows that are not present in both dicts are not added to the new list.
+    Both dicts are modified, make a copy if you want to do something else with them.
+    :param data: a list of OrderedDict, data set 1
+    :param metrics: a list of OrderedDict, data set 2
+    :return: a list of OrderedDict
+    """
+    data_keys = data[0].keys()
+    metrics_keys = metrics[0].keys()
+    intersect = list(set(data_keys) & set(metrics_keys))
+    merged_data = []
+    i = 0
+    while i < len(metrics):
+        mlp_item = metrics[i]
+        j = 0
+        while j < len(data):
+            dcp_item = data[j]
+            # Do fields match?
+            if 0 == [dcp_item[key] == mlp_item[key] for key in intersect].count(False):
+                merged_dict = mlp_item.copy()
+                merged_dict.update(dcp_item)
+                merged_data.append(merged_dict)
+                data.remove(dcp_item)
+                metrics.remove(mlp_item)
+                i -= 1
+                j -= 1
+            j += 1
+        i += 1
+    return merged_data
+
+
 def main():
     # options = parse_args(logger)
     options = parse_args(logger)
