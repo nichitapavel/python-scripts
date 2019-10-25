@@ -1,12 +1,13 @@
 import datetime
 from collections import OrderedDict
+from optparse import Values
 
 import pandas as pd
 import pytest
 
 from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems, sort_list_of_dict
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts
+from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts, main_dicts_merge
 
 
 @pytest.mark.parametrize(
@@ -138,4 +139,18 @@ def test_merge_dicts(request):
     data_csv = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
     metrics_csv = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
     result = merge_dicts(data=data_csv, metrics=metrics_csv)
+    assert expected == result
+
+
+def test_main_dicts_merge(request):
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    sort_list_of_dict(expected)
+    options = Values()
+    options._update_loose({
+        'data_file': f'{request.config.rootdir}/tests/resources/mt_processed_data.csv',
+        'metrics_file': f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv',
+        'save_directory': f'{request.config.rootdir}/tests/resources/'
+    })
+    main_dicts_merge(options, None)
+    null, result = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/merge_data.csv')
     assert expected == result
