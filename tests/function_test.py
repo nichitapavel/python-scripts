@@ -7,7 +7,7 @@ import pytest
 
 from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems, sort_list_of_dict
 from custom_exceptions import UnsupportedNumberOfCores
-from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts, main_dicts_merge
+from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts, main_dicts_merge, main_merge_pd
 
 
 @pytest.mark.parametrize(
@@ -154,3 +154,16 @@ def test_main_dicts_merge(request):
     main_dicts_merge(options, None)
     null, result = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/merge_data.csv')
     assert expected == result
+
+
+def test_main_merge_pd(request):
+    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    options = Values()
+    options._update_loose({
+        'data_file': f'{request.config.rootdir}/tests/resources/mt_processed_data.csv',
+        'metrics_file': f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv',
+        'save_directory': f'{request.config.rootdir}/tests/resources/'
+    })
+    main_merge_pd(options)
+    result = pd.read_csv(f'{options.save_directory}merge_data.csv')
+    assert expected.equals(result)
