@@ -1,4 +1,5 @@
 import datetime
+import os
 from collections import OrderedDict
 from optparse import Values
 
@@ -16,6 +17,12 @@ MT_METRICS_DATA = 'mt_metrics_data.csv'
 MT_PROCESSED_DATA = 'mt_processed_data.csv'
 CM_ON_INTERSECT_MERGE = 'cm_on_intersect_merge_data.csv'  # CM stands for Custom Merge
 CSV_TO_DICT = 'cm_read_csv_to_dict.csv'
+
+
+@pytest.fixture
+def cleanup(request):
+    yield
+    os.remove(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_RESULT_CSV_FILE}')
 
 
 @pytest.mark.parametrize(
@@ -164,7 +171,7 @@ def test_main_dicts_merge(request):
     assert expected == result
 
 
-def test_main_merge_pd(request):
+def test_main_merge_pd(request, cleanup):
     expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}')
     expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
     expected.reset_index(drop=True, inplace=True)
