@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 import pandas as pd
 
-from common import write_csv_list_of_dict, parse_args, sort_list_of_dict, DataFilterItems, IDs, PD_DTYPE
+from common import write_csv_list_of_dict, parse_args, sort_list_of_dict, DataFilterItems, IDs, PD_DTYPE, profile
 
 logging.basicConfig(
     level=logging.INFO,
@@ -155,4 +155,8 @@ def main():
 if __name__ == "__main__":
     # global logger
     logger = logging.getLogger('MERGE')
-    main()
+    mem = []
+    profile(mem, 'global', main)
+
+    for item in mem:
+        print(item)
