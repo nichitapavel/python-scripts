@@ -5,7 +5,7 @@ from optparse import Values
 import pandas as pd
 import pytest
 
-from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems, sort_list_of_dict
+from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterItems, sort_list_of_dict, PD_DTYPE
 from custom_exceptions import UnsupportedNumberOfCores
 from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts, main_dicts_merge, main_merge_pd
 
@@ -98,12 +98,12 @@ def test_set_cores_exception(req_cores):
 
 
 def test_merge_pd(request):
-    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv', dtype=PD_DTYPE)
     expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
     expected.reset_index(drop=True, inplace=True)
     data_1 = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
     data_2 = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
-    result = merge_pd(data_1, data_2)
+    result = merge_pd(metrics_file=data_1, data_file=data_2)
     assert expected.equals(result)
 
 
@@ -158,6 +158,8 @@ def test_main_dicts_merge(request):
 
 def test_main_merge_pd(request):
     expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
+    expected.reset_index(drop=True, inplace=True)
     options = Values()
     options._update_loose({
         'data_file': f'{request.config.rootdir}/tests/resources/mt_processed_data.csv',
