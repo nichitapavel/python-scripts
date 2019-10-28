@@ -1,0 +1,3 @@
+type,device,os,benchmark,size,threads,iteration,joules,time
+release,hikey970,android,bt,w,1,001,911.300707424,132.6846
+debug,hikey970,android,is,b,2,001,83.678068716,11.2442
