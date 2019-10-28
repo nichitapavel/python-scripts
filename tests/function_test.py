@@ -9,6 +9,14 @@ from common import read_timestamp, csv_name_parsing, set_cores, IDs, DataFilterI
 from custom_exceptions import UnsupportedNumberOfCores
 from merge import merge_pd, read_csv_to_dict, merge_on_intersect_dicts, merge_dicts, main_dicts_merge, main_merge_pd
 
+TEST_RESOURCES = 'tests/resources'
+MT_RESULT_CSV_FILE = 'merge_data.csv'
+MT_MERGE = 'mt_merged_data.csv'  # PD stands for Pandas Merge, MT/mt stands for 'merge test'
+MT_METRICS_DATA = 'mt_metrics_data.csv'
+MT_PROCESSED_DATA = 'mt_processed_data.csv'
+CM_ON_INTERSECT_MERGE = 'cm_on_intersect_merge_data.csv'  # CM stands for Custom Merge
+CSV_TO_DICT = 'cm_read_csv_to_dict.csv'
+
 
 @pytest.mark.parametrize(
     "timestamp, ex_timestamp",
@@ -98,11 +106,11 @@ def test_set_cores_exception(req_cores):
 
 
 def test_merge_pd(request):
-    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv', dtype=PD_DTYPE)
+    expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}', dtype=PD_DTYPE)
     expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
     expected.reset_index(drop=True, inplace=True)
-    data_1 = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
-    data_2 = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
+    data_1 = f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA}'
+    data_2 = f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA}'
     result = merge_pd(metrics_file=data_1, data_file=data_2)
     assert expected.equals(result)
 
@@ -120,52 +128,52 @@ def test_read_csv_to_dict(request):
             IDs.THREADS: '2', IDs.ITERATION: '001', IDs.ENERGY: '83.678068716', IDs.TIME: '11.2442'
         })
     ]
-    keys, data = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/cm_read_csv_to_dict.csv')
+    keys, data = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{CSV_TO_DICT}')
     assert expected_keys == keys
     assert expected_data == data
 
 
 def test_merge_on_intersect_dicts(request):
-    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/cm_merged_data.csv')
-    null, metrics_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv')
-    null, data_csv = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_processed_data.csv')
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{CM_ON_INTERSECT_MERGE}')
+    null, metrics_csv = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA}')
+    null, data_csv = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA}')
     result = merge_on_intersect_dicts(metrics=metrics_csv, data=data_csv)
     assert expected == result
 
 
 def test_merge_dicts(request):
-    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}')
     sort_list_of_dict(expected)
-    data_csv = f'{request.config.rootdir}/tests/resources/mt_processed_data.csv'
-    metrics_csv = f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv'
+    data_csv = f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA}'
+    metrics_csv = f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA}'
     result = merge_dicts(data=data_csv, metrics=metrics_csv)
     assert expected == result
 
 
 def test_main_dicts_merge(request):
-    null, expected = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    null, expected = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}')
     sort_list_of_dict(expected)
     options = Values()
     options._update_loose({
-        'data_file': f'{request.config.rootdir}/tests/resources/mt_processed_data.csv',
-        'metrics_file': f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv',
-        'save_directory': f'{request.config.rootdir}/tests/resources/'
+        'data_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA}',
+        'metrics_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA}',
+        'save_directory': f'{request.config.rootdir}/{TEST_RESOURCES}/'
     })
     main_dicts_merge(options, None)
-    null, result = read_csv_to_dict(f'{request.config.rootdir}/tests/resources/merge_data.csv')
+    null, result = read_csv_to_dict(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_RESULT_CSV_FILE}')
     assert expected == result
 
 
 def test_main_merge_pd(request):
-    expected = pd.read_csv(f'{request.config.rootdir}/tests/resources/mt_merged_data.csv')
+    expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}')
     expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
     expected.reset_index(drop=True, inplace=True)
     options = Values()
     options._update_loose({
-        'data_file': f'{request.config.rootdir}/tests/resources/mt_processed_data.csv',
-        'metrics_file': f'{request.config.rootdir}/tests/resources/mt_metrics_data.csv',
-        'save_directory': f'{request.config.rootdir}/tests/resources/'
+        'data_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA}',
+        'metrics_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA}',
+        'save_directory': f'{request.config.rootdir}/{TEST_RESOURCES}/'
     })
     main_merge_pd(options)
-    result = pd.read_csv(f'{options.save_directory}merge_data.csv')
+    result = pd.read_csv(f'{options.save_directory}{MT_RESULT_CSV_FILE}')
     assert expected.equals(result)
