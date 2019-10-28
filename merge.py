@@ -129,6 +129,15 @@ def main_dicts_merge(options, log):
     write_csv_list_of_dict('merge_data.csv', merged_data, log, overwrite=True)
 
 
+def merge_pd(data_file: str, metrics_file: str):
+    data_csv = pd.read_csv(data_file, dtype=PD_DTYPE)
+    metrics_csv = pd.read_csv(metrics_file, dtype=PD_DTYPE)
+    merge_on = DataFilterItems.copy()
+    merge_on.append(IDs.ITERATION)
+    merged_data = metrics_csv.merge(data_csv, on=merge_on, sort=True, how='outer')
+    return merged_data
+
+
 def main_merge_pd(options):
     merged_data = merge_pd(data_file=options.data_file, metrics_file=options.metrics_file)
     merged_data.to_csv(path_or_buf=f'{options.save_directory}/merge_data.csv', index=False)
@@ -137,15 +146,6 @@ def main_merge_pd(options):
 def main():
     options = parse_args(logger)
     main_dicts_merge(options, logger)
-
-
-def merge_pd(data_file: str, metrics_file: str):
-    data_csv = pd.read_csv(data_file, dtype=PD_DTYPE)
-    metrics_csv = pd.read_csv(metrics_file, dtype=PD_DTYPE)
-    merge_on = DataFilterItems.copy()
-    merge_on.append(IDs.ITERATION)
-    merged_data = metrics_csv.merge(data_csv, on=merge_on, sort=True, how='outer')
-    return merged_data
 
 
 if __name__ == "__main__":
