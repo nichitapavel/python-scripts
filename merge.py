@@ -36,7 +36,7 @@ def parse_args(logger):
 
 def read_csv_to_dict(csv_file: str) -> 'list,list':
     """
-    Read a csv file and transform it into a OrderDict
+    Read a csv file and transform it into a OrderedDict
     :param csv_file: string with the path of file to read (including file name)
     :return: A list of keys (header of csv), A list of OrderedDict (data of csv)
     """
