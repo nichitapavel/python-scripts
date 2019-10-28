@@ -148,7 +148,8 @@ def main_merge_pd(options):
 
 def main():
     options = parse_args(logger)
-    main_dicts_merge(options, logger)
+    # main_dicts_merge(options, logger)  # bad perfomance in general
+    main_merge_pd(options)
 
 
 if __name__ == "__main__":
