@@ -61,10 +61,12 @@ def merge_on_intersect_dicts(data: list, metrics: list) -> list:
     intersect = list(set(data_keys) & set(metrics_keys))
     merged_data = []
     i = 0
-    while i < len(metrics):
+    metrics_length = len(metrics)
+    data_length = len(data)
+    while i < metrics_length:
         mlp_item = metrics[i]
         j = 0
-        while j < len(data):
+        while j < data_length:
             dcp_item = data[j]
             # Do fields match?
             if 0 == [dcp_item[key] == mlp_item[key] for key in intersect].count(False):
@@ -75,6 +77,8 @@ def merge_on_intersect_dicts(data: list, metrics: list) -> list:
                 metrics.remove(mlp_item)
                 i -= 1
                 j -= 1
+                metrics_length -= 1
+                data_length -= 1
             j += 1
         i += 1
     return merged_data
@@ -125,7 +129,6 @@ def merge_dicts(data: str, metrics: str):
 def main_dicts_merge(options, log):
     merged_data = merge_dicts(metrics=options.metrics_file, data=options.data_file)
     os.chdir(options.save_directory)
-    sort_list_of_dict(merged_data)
     write_csv_list_of_dict('merge_data.csv', merged_data, log, overwrite=True)
 
 
