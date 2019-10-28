@@ -19,6 +19,8 @@ CM_ON_INTERSECT_MERGE = 'cm_on_intersect_merge_data.csv'  # CM stands for Custom
 CSV_TO_DICT = 'cm_read_csv_to_dict.csv'
 
 
+# TODO use fixture to load and share test data [1]([)https://docs.pytest.org/en/latest/fixture.html#sharing-test-data)
+# TODO use community plugins to manage directories/files [1]
 @pytest.fixture
 def cleanup(request):
     yield
