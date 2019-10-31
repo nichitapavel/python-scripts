@@ -1,18 +1,18 @@
 import logging
+import os
 import signal
 import socket
 import struct
 import sys
 import threading
-import os
 import urllib
-import urlparse
-from Queue import Empty, Queue
 from datetime import datetime
+from enum import Enum
 from optparse import OptionParser
 from time import sleep
 
-from enum import Enum
+import urlparse
+from Queue import Queue
 from flask import request, Flask
 
 logging.basicConfig(
@@ -83,7 +83,7 @@ class FlaskThread(threading.Thread):
         except Exception:
             logger.exception('[Fatal error when starting flask server]')
             for thread in threading.enumerate():
-                if thread.name is 'PMInfoThread':
+                if thread.name == 'PMInfoThread':
                     thread.join()
             sys.exit(1)
 

@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 import pandas as pd
 
-from common import write_csv_list_of_dict, parse_args, sort_list_of_dict, DataFilterItems, IDs, PD_DTYPE, profile
+from common import write_csv_list_of_dict, sort_list_of_dict, DataFilterItems, IDs, PD_DTYPE, profile
 
 logging.basicConfig(
     level=logging.INFO,

@@ -175,7 +175,9 @@ def set_cores(req_cores):
         else:
             return sys_cores
     if req_cores > sys_cores or req_cores <= 0:
-        raise UnsupportedNumberOfCores(f'Requested cores \'{req_cores}\' is not supported, available cores: {sys_cores}')
+        raise UnsupportedNumberOfCores(
+            f'Requested cores \'{req_cores}\' is not supported, available cores: {sys_cores}'
+        )
     return req_cores
 
 

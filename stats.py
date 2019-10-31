@@ -9,7 +9,7 @@ import numpy
 import pandas as pd
 import seaborn as sns
 
-from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
+from common import log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
 from plotters import box_plot
 
 
@@ -257,7 +257,8 @@ if __name__ == "__main__":
 
 # PANDA
 # df_sub = df[ df['salary'] > 120000 ] -> select data where salary > 120 000
-# data frame method: mean, median, mod, mad, max, min, std (standard deviation), var, dropna (drop records with no values)
+# data frame method:
+#   mean, median, mod, mad, max, min, std (standard deviation), var, dropna (drop records with no values)
 # object.describe -> does many of previous
 # df_rank = df.groupby(['rank']) -> split data based on rank
 # df.groupby(['rank'], sort=False) -> sort=False for speedup
