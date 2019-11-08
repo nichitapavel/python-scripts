@@ -198,6 +198,7 @@ def create_and_write_stats(df):
         stats = stats.round(decimals=3)
         for result in ResultItems:
             stats_dict = update_dict(stats, data_dict, result)
+            stats_dict['count'] = numpy.int(stats_dict['count'])
             stats_results[result].append(stats_dict)
     for result in ResultItems:
         write_csv_list_of_dict(f'stats_{result}.csv', stats_results[result], logger, overwrite=True)
