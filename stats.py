@@ -31,7 +31,8 @@ def parse_args(logger):
 
 def clean_data(df):
     """
-    Clean data from Null (empty) or 0.0 values
+    Clean data from Null (empty) or 0.0 values, also remove values with bigger
+    than 1% difference between 'time_npb' and 'time'
     :param df: DataFrame read with panda from a csv (usually and in my case)
     :return: DataFrame without Null (empty) or 0.0 values
     """
@@ -194,6 +195,7 @@ def create_and_write_stats(df):
                              .quantile([0.25, 0.5, 0.75])
                              .rename(index={0.25: 'q1', 0.5: 'q2_median', 0.75: 'q3'})
                              )
+        stats = stats.round(decimals=3)
         for result in ResultItems:
             stats_dict = update_dict(stats, data_dict, result)
             stats_results[result].append(stats_dict)

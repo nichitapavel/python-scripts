@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 import pandas as pd
 
-from common import write_csv_list_of_dict, sort_list_of_dict, DataFilterItems, IDs, PD_DTYPE, profile
+from common import write_csv_list_of_dict, sort_list_of_dict, DataFilterItems, IDs, profile
 
 logging.basicConfig(
     level=logging.INFO,
@@ -133,8 +133,8 @@ def main_dicts_merge(options, log):
 
 
 def merge_pd(data_file: str, metrics_file: str):
-    data_csv = pd.read_csv(data_file, dtype=PD_DTYPE)
-    metrics_csv = pd.read_csv(metrics_file, dtype=PD_DTYPE)
+    data_csv = pd.read_csv(data_file)
+    metrics_csv = pd.read_csv(metrics_file)
     merge_on = DataFilterItems.copy()
     merge_on.append(IDs.ITERATION)
     merged_data = metrics_csv.merge(data_csv, on=merge_on, sort=True, how='outer')
@@ -143,6 +143,7 @@ def merge_pd(data_file: str, metrics_file: str):
 
 def main_merge_pd(options):
     merged_data = merge_pd(data_file=options.data_file, metrics_file=options.metrics_file)
+    merged_data = merged_data.round(decimals=3)
     merged_data.to_csv(path_or_buf=f'{options.save_directory}/merge_data.csv', index=False)
 
 
