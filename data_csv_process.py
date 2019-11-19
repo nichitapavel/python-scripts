@@ -139,14 +139,14 @@ def data_file_process(cwd, file):
     ts_xf = None
     with open(file, 'r+') as f:
         energy_dict = csv_name_parsing(file)
-        ts_first = profile(mem, file, first_timestamp, f)
-        profile(mem, file, check_last_row, f, logger)
+        ts_first = first_timestamp(f)
+        check_last_row(f, logger)
         ts_xs, ts_xf, energy_dict['joules'], energy_dict['time'] = \
-            profile(mem, file, csv_process, data, f, ts_first, ts_xs, ts_xf)
+            csv_process(data, f, ts_first, ts_xs, ts_xf)
     if ts_xs and ts_xf:
-        profile(mem, file, power_plot, file, data['td_dt_00'], data['mw'], data['pos_and_marks'])
+        power_plot(file, data['td_dt_00'], data['mw'], data['pos_and_marks'])
         del data['time'], data['td_dt_00'], data['pos_and_marks']
-        profile(mem, file, write_csv_dict_with_lists, f'transformed-{file}', data)
+        write_csv_dict_with_lists(f'transformed-{file}', data)
     else:
         logger.warning(f'[{cwd}][{file}][XS operation not found, skip this file]')
         # Meta cache system: we use the EXISTENCE of file that starts with 'transformed-' (empty or with data)
@@ -197,7 +197,7 @@ def main():
             processed_data.append(result.get())
 
     sort_list_of_dict(processed_data)
-    profile(mem, 'main', write_csv_list_of_dict, 'processed_data.csv', processed_data, logger)
+    write_csv_list_of_dict('processed_data.csv', processed_data, logger)
 
 
 if __name__ == "__main__":

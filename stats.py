@@ -9,15 +9,16 @@ import numpy
 import pandas as pd
 import seaborn as sns
 
-from common import parse_args, log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
+from common import log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
 from plotters import box_plot
 
 
 def parse_args(logger):
     # Parsear linea de comandos
-    parser = OptionParser("usage: %prog -d|--directory DIRECTORY")
+    parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("--df", "--data-file", action="store", type="string", dest="data_file")
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")
+    parser.add_option("--only-stats", action="store_true", dest="only_stats")
     (options, args) = parser.parse_args()
     if not options.data_file or \
             not options.save_directory:
@@ -30,12 +31,17 @@ def parse_args(logger):
 
 def clean_data(df):
     """
-    Clean data from Null (empty) or 0.0 values
+    Clean data from Null (empty) or 0.0 values, also remove values with bigger
+    than 1% difference between 'time_npb' and 'time'
     :param df: DataFrame read with panda from a csv (usually and in my case)
     :return: DataFrame without Null (empty) or 0.0 values
     """
     df = df.dropna()
-    # df = df[df[IDs.ITERATION] > 10]
+    # df = df[df[IDs.ITERATION] > 10]  # Remove the warmup = first 10 iterations
+    # Remove data that has a more than 1% difference between npb reported time and
+    # time calculated from power metric files
+    df = df[df['time_npb'] / df['time'] > 0.99]
+
     for item in ResultItems:
         df = df[df[item] != 0]
     return df
@@ -79,7 +85,7 @@ def cat_plotting_group(cwd, df, options, x_axis_groupby, type):
     values = ['mean', 'q2_median']
     with Pool(CORES) as p:
         results = [p.apply_async(
-            catplot_for_parallel, (df_groups, options, type, value, x_axis_groupby)
+            catplot_group_for_parallel, (df_groups, options, type, value, x_axis_groupby)
         ) for value in values]
         for result in results:
             result.get()
@@ -190,8 +196,10 @@ def create_and_write_stats(df):
                              .quantile([0.25, 0.5, 0.75])
                              .rename(index={0.25: 'q1', 0.5: 'q2_median', 0.75: 'q3'})
                              )
+        stats = stats.round(decimals=3)
         for result in ResultItems:
             stats_dict = update_dict(stats, data_dict, result)
+            stats_dict['count'] = numpy.int(stats_dict['count'])
             stats_results[result].append(stats_dict)
     for result in ResultItems:
         write_csv_list_of_dict(f'stats_{result}.csv', stats_results[result], logger, overwrite=True)
@@ -207,33 +215,34 @@ def main():
 
     df = pd.read_csv(options.data_file)
     df = clean_data(df)
-
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.THREADS)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
-    box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
-    logger.info(f'[{options.data_file}]')
-
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
-    box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
-
-    box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
-
     stats = create_and_write_stats(df)
-    for resultItem in ResultItems:
-        pd_stats = pd.DataFrame(stats[resultItem])
-        cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
-        cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
-        cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
+
+    if not options.only_stats:
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.THREADS)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
+        box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
+        logger.info(f'[{options.data_file}]')
+
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
+        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
+
+        box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
+
+        for resultItem in ResultItems:
+            pd_stats = pd.DataFrame(stats[resultItem])
+            cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
+            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
+            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
 
     # df = sns.load_dataset('tips')
     # sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
@@ -252,7 +261,8 @@ if __name__ == "__main__":
 
 # PANDA
 # df_sub = df[ df['salary'] > 120000 ] -> select data where salary > 120 000
-# data frame method: mean, median, mod, mad, max, min, std (standard deviation), var, dropna (drop records with no values)
+# data frame method:
+#   mean, median, mod, mad, max, min, std (standard deviation), var, dropna (drop records with no values)
 # object.describe -> does many of previous
 # df_rank = df.groupby(['rank']) -> split data based on rank
 # df.groupby(['rank'], sort=False) -> sort=False for speedup

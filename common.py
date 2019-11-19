@@ -37,6 +37,9 @@ class IDs:
 ResultItems = [IDs.TIME, IDs.TIME_NPB, IDs.ENERGY, IDs.MOPS]
 DataFilterItems = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.SIZE, IDs.THREADS]
 
+# Pandas DTYPE to interpret columns as string, needed for merging metrics and processed files
+PD_DTYPE = {IDs.TIME_NPB: str, IDs.MOPS: str, IDs.ENERGY: str, IDs.TIME: str}
+
 # Devices used in testing
 HIKEY970 = 'hikey970'
 ODROIDXU4_A = 'odroidxu4a'
@@ -174,7 +177,9 @@ def set_cores(req_cores):
         else:
             return sys_cores
     if req_cores > sys_cores or req_cores <= 0:
-        raise UnsupportedNumberOfCores(f'Requested cores \'{req_cores}\' is not supported, available cores: {sys_cores}')
+        raise UnsupportedNumberOfCores(
+            f'Requested cores \'{req_cores}\' is not supported, available cores: {sys_cores}'
+        )
     return req_cores
 
 
@@ -238,7 +243,7 @@ def write_csv_list_of_dict(filename, csv_data, logger, overwrite=False):
 
 def parse_args(logger):
     # Parsear linea de comandos
-    parser = OptionParser('usage: %prog -d|--directory DIRECTORY')
+    parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option('-d', '--directory', action='store', type='string', dest='directory')
     parser.add_option('-c', '--cores', action='store', type='int', dest='cores')
     parser.add_option('-s', '--starts-with', action='store', type='string', dest='starts_with')

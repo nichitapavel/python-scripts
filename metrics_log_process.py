@@ -139,7 +139,7 @@ def main():
             processed_data.extend(result.get())
 
     sort_list_of_dict(processed_data)
-    profile(mem, 'main', write_csv_list_of_dict, 'metrics_data.csv', processed_data, logger, True)
+    write_csv_list_of_dict('metrics_data.csv', processed_data, logger)
 
 
 if __name__ == "__main__":
