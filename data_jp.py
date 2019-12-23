@@ -46,14 +46,23 @@ def main():
     logger.addHandler(log_to_file('stats.log'))
     cwd = os.getcwd()
     files = get_files('merge_data_')
-    filter_by = ['hikey970', 'linux', 'bt', 'w', 2]
-    for file in files:
-        index = int(file[-6:-4])
-        df = pd.read_csv(file)
-        group = df[df['device'] == filter_by[0]][df['os'] == filter_by[1]][df['benchmark'] == filter_by[2]][df['size'] == filter_by[3]][df['threads'] == filter_by[4]]
-        df_groups = df.groupby(['device', 'os', 'benchmark', 'size', 'threads'])
-        for group in df_groups:
-            print('ole')
+    # filter_by = ['hikey970', 'linux', 'mg', 'b', 8]
+    filter_by = combinations()
+    for cbn in combinations():
+        group = pd.DataFrame()
+        for file in files:
+            index = int(file[-6:-4])
+            df = pd.read_csv(file)
+            file_data = df[df['device'] == cbn[0]][df['os'] == cbn[1]][df['benchmark'] == cbn[2]][df['size'] == cbn[3]][df['threads'] == cbn[4]]
+            file_data['file-number'] = index
+            group = group.append(file_data)
+            # df_groups = df.groupby(['device', 'os', 'benchmark', 'size', 'threads'])
+
+        group.reset_index(drop=True, inplace=True)
+        group.index += 1
+        group['old-iteration'] = group['iteration']
+        group['iteration'] = group.index
+        group.to_csv(path_or_buf=f'{options.directory}/{cbn[0]}_{cbn[1]}_{cbn[2]}_{cbn[3]}_{cbn[4]}.csv', index=False)
 
 
 if __name__ == "__main__":
