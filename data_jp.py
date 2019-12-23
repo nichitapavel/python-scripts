@@ -1,17 +1,11 @@
 import logging
 import os
-import sys
-from multiprocessing.pool import Pool
 from optparse import OptionParser
 
-import matplotlib.pyplot as plt
-import numpy
 import pandas as pd
-import seaborn as sns
 
-from common import log_to_file, IDs, profile, DataFilterItems, ResultItems, write_csv_list_of_dict, CORES
+from common import log_to_file, profile, HIKEY970, ROCK960
 from data_csv_process import get_files
-from plotters import box_plot
 
 
 def parse_args(logger):
