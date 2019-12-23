@@ -12,6 +12,7 @@ def parse_args(logger):
     # Parsear linea de comandos
     parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("-d", "--directory", action="store", type="string", dest="directory")
+    parser.add_option("-m", "--merge", action="store_true", dest="merge")
     (options, args) = parser.parse_args()
     # if not options.data_file or \
     #         not options.save_directory:
@@ -45,6 +46,16 @@ def main():
     os.chdir(options.directory)
     logger.addHandler(log_to_file('stats.log'))
     cwd = os.getcwd()
+    if options.merge:
+        files = []
+        [files.extend(get_files(file)) for file in [HIKEY970, ROCK960, 'odroidxu4']]
+        merge_data = pd.DataFrame()
+        for file in files:
+            merge_data = merge_data.append(pd.read_csv(file))
+        merge_data.sort_values(by=['device', 'os', 'benchmark', 'size', 'threads'], inplace=True)
+        merge_data.to_csv(path_or_buf=f'{options.directory}/merge_data.csv', index=False)
+        exit(0)
+
     files = get_files('merge_data_')
     # filter_by = ['hikey970', 'linux', 'mg', 'b', 8]
     filter_by = combinations()
