@@ -22,6 +22,24 @@ def parse_args(logger):
     return options
 
 
+def combinations():
+    devices = [HIKEY970, 'odroidxu4', ROCK960]
+    oss = ['linux', 'android']
+    benchmarks = ['bt', 'is', 'mg']
+    sizes = ['b', 'w']
+    threads = [1, 2, 4, 6, 8]
+    filters = []
+    for device in devices:
+        for os in oss:
+            for benchmark in benchmarks:
+                for size in sizes:
+                    for thread in threads:
+                        filters.append(
+                            [device, os, benchmark, size, thread]
+                        )
+    return filters
+
+
 def main():
     options = parse_args(logger)
     os.chdir(options.directory)
