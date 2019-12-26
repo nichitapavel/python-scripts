@@ -66,7 +66,7 @@ def main():
             df = pd.read_csv(file)
             file_data = df[df['device'] == cbn[0]][df['os'] == cbn[1]][df['benchmark'] == cbn[2]][df['size'] == cbn[3]][df['threads'] == cbn[4]]
             file_data['file-number'] = index
-            group = group.append(file_data)
+            group = group.append(file_data, sort=False)
             # df_groups = df.groupby(['device', 'os', 'benchmark', 'size', 'threads'])
 
         group.reset_index(drop=True, inplace=True)
