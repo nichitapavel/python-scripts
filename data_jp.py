@@ -59,7 +59,7 @@ def main():
     files = get_files('merge_data_')
     # filter_by = ['hikey970', 'linux', 'mg', 'b', 8]
     filter_by = combinations()
-    for cbn in combinations():
+    for cbn in filter_by:
         group = pd.DataFrame()
         for file in files:
             index = int(file[-6:-4])
