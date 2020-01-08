@@ -15,6 +15,7 @@ MT_RESULT_CSV_FILE = 'merge_data.csv'
 MT_MERGE = 'mt_merged_data.csv'  # PD stands for Pandas Merge, MT/mt stands for 'merge test'
 MT_METRICS_DATA = 'mt_metrics_data.csv'
 MT_PROCESSED_DATA = 'mt_processed_data.csv'
+MT_MERGE_2 = 'mt_merged_data_2.csv'
 CM_ON_INTERSECT_MERGE = 'cm_on_intersect_merge_data.csv'  # CM stands for Custom Merge
 CSV_TO_DICT = 'cm_read_csv_to_dict.csv'
 
@@ -175,8 +176,8 @@ def test_main_dicts_merge(request):
     assert expected == result
 
 
-def test_main_merge_pd(request, cleanup):
-    expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE}')
+def test_main_merge_pd_wo_type(request, cleanup):
+    expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE_2}')
     expected = expected.round(decimals=3)
     expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
     expected.reset_index(drop=True, inplace=True)
