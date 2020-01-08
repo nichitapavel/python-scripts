@@ -1,0 +1,15 @@
+type,device,os,benchmark,size,threads,iteration,joules,time
+release,hikey970,android,bt,w,1,1,911.300707424,132.6846
+debug,hikey970,android,is,b,2,1,83.678068716,11.2442
+,hikey970,android,is,b,4,1,73.3683135845,9.4403
+release,hikey970,android,mg,b,2,1,271.229534946,38.9861
+release,hikey970,linux,bt,w,2,10,354.8471431505,51.7461
+,hikey970,linux,bt,w,4,1,285.6785665255,40.7981
+,hikey970,linux,bt,w,8,2,248.2447808785,32.6258
+,hikey970,linux,is,b,2,1,65.9164236385,7.3351
+debug,hikey970,linux,is,b,4,1,47.5400419035,5.2724
+,hikey970,linux,is,b,8,1,62.1444796935,7.9518
+,hikey970,linux,mg,b,2,1,151.3328021895,17.6413
+,hikey970,linux,mg,b,4,1,158.703355832,21.5559
+release,hikey970,linux,mg,b,8,1,156.2492591375,21.4132
+,odroidxu4,android,bt,w,1,1,540.9973433415,91.076
