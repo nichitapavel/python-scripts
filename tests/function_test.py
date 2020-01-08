@@ -16,6 +16,9 @@ MT_MERGE = 'mt_merged_data.csv'  # PD stands for Pandas Merge, MT/mt stands for 
 MT_METRICS_DATA = 'mt_metrics_data.csv'
 MT_PROCESSED_DATA = 'mt_processed_data.csv'
 MT_MERGE_2 = 'mt_merged_data_2.csv'
+MT_MERGE_3 = 'mt_merged_data_3.csv'  # PD stands for Pandas Merge, MT/mt stands for 'merge test'
+MT_METRICS_DATA_3 = 'mt_metrics_data_3.csv'
+MT_PROCESSED_DATA_3 = 'mt_processed_data_3.csv'
 CM_ON_INTERSECT_MERGE = 'cm_on_intersect_merge_data.csv'  # CM stands for Custom Merge
 CSV_TO_DICT = 'cm_read_csv_to_dict.csv'
 
@@ -189,5 +192,24 @@ def test_main_merge_pd_wo_type(request, cleanup):
     })
     main_merge_pd(options)
     result = pd.read_csv(f'{options.save_directory}{MT_RESULT_CSV_FILE}')
+    result = result.round(decimals=3)
+    assert expected.equals(result)
+
+
+def test_main_merge_pd_ws_type(request, cleanup):
+    expected = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_MERGE_3}')
+    expected = expected.round(decimals=3)
+    expected.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
+    expected.reset_index(drop=True, inplace=True)
+    options = Values()
+    options._update_loose({
+        'data_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_PROCESSED_DATA_3}',
+        'metrics_file': f'{request.config.rootdir}/{TEST_RESOURCES}/{MT_METRICS_DATA_3}',
+        'save_directory': f'{request.config.rootdir}/{TEST_RESOURCES}/'
+    })
+    main_merge_pd(options)
+    result = pd.read_csv(f'{options.save_directory}{MT_RESULT_CSV_FILE}')
+    result.sort_values(by=expected.columns.to_list()[:-4], inplace=True)
+    result.reset_index(drop=True, inplace=True)
     result = result.round(decimals=3)
     assert expected.equals(result)
