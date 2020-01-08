@@ -35,9 +35,32 @@ def combinations():
             for benchmark in benchmarks:
                 for size in sizes:
                     for thread in threads:
-                        filters.append(
-                            [device, os, benchmark, size, thread]
-                        )
+                        filters.append([device, os, benchmark, size, thread])
+    # Remove combinations of benchmark and size that we don't have
+    remove = []
+    for pair in [['bt', 'b'], ['is', 'w'], ['mg', 'w']]:
+        for item in filters:
+            if pair[0] == item[2] and pair[1] == item[3]:
+                remove.append(item)
+    for item in remove:
+        filters.remove(item)
+    # Remove combinations of device and threads that we don't have
+    remove = []
+    for pair in [[HIKEY970, 6], [ROCK960, 8], ['odroidxu4', 6]]:
+        for item in filters:
+            if pair[0] == item[0] and pair[1] == item[4]:
+                remove.append(item)
+    for item in remove:
+        filters.remove(item)
+    # Remove combinations of os and thread that we don't have
+    remove = []
+    for pair in [['android', 6], ['android', 8]]:
+        for item in filters:
+            if pair[0] == item[1] and pair[1] == item[4]:
+                remove.append(item)
+    for item in remove:
+        filters.remove(item)
+
     return filters
 
 
