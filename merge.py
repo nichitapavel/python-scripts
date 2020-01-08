@@ -141,9 +141,18 @@ def merge_pd(data_file: str, metrics_file: str):
     return merged_data
 
 
+def set_type(x):
+    if pd.isnull(x):
+        return 'default'
+    else:
+        return x
+
+
 def main_merge_pd(options):
     merged_data = merge_pd(data_file=options.data_file, metrics_file=options.metrics_file)
     merged_data = merged_data.round(decimals=3)
+    if merged_data['type'].hasnans:
+        merged_data['type'] = merged_data['type'].apply(set_type)
     merged_data.to_csv(path_or_buf=f'{options.save_directory}/merge_data.csv', index=False)
 
 
