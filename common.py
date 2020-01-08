@@ -86,7 +86,7 @@ def csv_name_parsing(filename):
         try:
             csv_row.update({'type': parts_csv[-8]})
         except IndexError:
-            csv_row.update({'type': ''})
+            csv_row.update({'type': 'default'})
             pass
         csv_row.update({
             'device': parts_csv[-6],
@@ -102,7 +102,7 @@ def csv_name_parsing(filename):
         try:
             csv_row.update({'type': parts_log[-7]})
         except IndexError:
-            csv_row.update({'type': ''})
+            csv_row.update({'type': 'default'})
             pass
         csv_row.update({
             'device': parts_log[-5],

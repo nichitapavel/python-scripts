@@ -57,15 +57,15 @@ def test_read_timestamp(timestamp, ex_timestamp):
     [
         (
             'data-debug_hikey970_android_is_b_1_050.csv',
-            {'type': '', 'device': 'hikey970', 'os': 'android', 'benchmark': 'is', 'size': 'b', 'threads': '1', 'iteration': '050'}
+            {'type': 'default', 'device': 'hikey970', 'os': 'android', 'benchmark': 'is', 'size': 'b', 'threads': '1', 'iteration': '050'}
         ),
         (
             'data-release_odroidxu4a_linux_mg_b_4_050.csv',
-            {'type': '', 'device': 'odroidxu4a', 'os': 'linux', 'benchmark': 'mg', 'size': 'b', 'threads': '4', 'iteration': '050'}
+            {'type': 'default', 'device': 'odroidxu4a', 'os': 'linux', 'benchmark': 'mg', 'size': 'b', 'threads': '4', 'iteration': '050'}
         ),
         (
             'data_rock960_android_mg_b_4_050.csv',
-            {'type': '', 'device': 'rock960', 'os': 'android', 'benchmark': 'mg', 'size': 'b', 'threads': '4', 'iteration': '050'}
+            {'type': 'default', 'device': 'rock960', 'os': 'android', 'benchmark': 'mg', 'size': 'b', 'threads': '4', 'iteration': '050'}
         ),
         (
             '03_release_data_odroidxu4a_android_is_b_2_108.csv',
@@ -77,7 +77,7 @@ def test_read_timestamp(timestamp, ex_timestamp):
         ),
         (
             'metrics_hikey970_android_bt_s_1.log',
-            {'type': '', 'device': 'hikey970', 'os': 'android', 'benchmark': 'bt', 'size': 's', 'threads': '1'}
+            {'type': 'default', 'device': 'hikey970', 'os': 'android', 'benchmark': 'bt', 'size': 's', 'threads': '1'}
         )
         # (
         #         'data_odroidxu4a_is_b_2_001',
