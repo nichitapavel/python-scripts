@@ -76,7 +76,11 @@ def main():
         for file in files:
             index = int(file[-6:-4])
             df = pd.read_csv(file)
-            df = df[df['device'] == cbn[0]][df['os'] == cbn[1]][df['benchmark'] == cbn[2]][df['size'] == cbn[3]][df['threads'] == cbn[4]]
+            df = df[df['device'] == cbn[0]]
+            df = df[df['os'] == cbn[1]]
+            df = df[df['benchmark'] == cbn[2]]
+            df = df[df['size'] == cbn[3]]
+            df = df[df['threads'] == cbn[4]]
             df['file-number'] = index
             group = group.append(df, sort=False)
         group.reset_index(drop=True, inplace=True)
@@ -85,6 +89,7 @@ def main():
         group['iteration'] = group.index
         data = data.append(group, sort=False)
     data = clean_data(data)
+    data = data.round(decimals=3)
     data.to_csv(path_or_buf=f'{options.directory}/merge_data.csv', index=False)
 
 
