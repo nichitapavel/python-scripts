@@ -1,25 +1,25 @@
 import logging
 import os
+import sys
 from optparse import OptionParser
 
 import pandas as pd
 
 from common import log_to_file, profile, HIKEY970, ROCK960
 from data_csv_process import get_files
+from stats import clean_data
 
 
 def parse_args(logger):
     # Parsear linea de comandos
     parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("-d", "--directory", action="store", type="string", dest="directory")
-    parser.add_option("-m", "--merge", action="store_true", dest="merge")
     (options, args) = parser.parse_args()
-    # if not options.data_file or \
-    #         not options.save_directory:
-    #     # This logger line will not be saved to file
-    #     logger.error('[You must specify files and a directory to save]')
-    #     parser.print_help()
-    #     sys.exit(-1)
+    if not options.directory:
+        # This logger line will not be saved to file
+        logger.error('[You must specify files and a directory with merge_data_XX.csv files]')
+        parser.print_help()
+        sys.exit(-1)
     return options
 
 
@@ -68,35 +68,24 @@ def main():
     options = parse_args(logger)
     os.chdir(options.directory)
     logger.addHandler(log_to_file('stats.log'))
-    cwd = os.getcwd()
-    if options.merge:
-        files = []
-        [files.extend(get_files(file)) for file in [HIKEY970, ROCK960, 'odroidxu4']]
-        merge_data = pd.DataFrame()
-        for file in files:
-            merge_data = merge_data.append(pd.read_csv(file))
-        merge_data.sort_values(by=['device', 'os', 'benchmark', 'size', 'threads'], inplace=True)
-        merge_data.to_csv(path_or_buf=f'{options.directory}/merge_data.csv', index=False)
-        exit(0)
-
+    data = pd.DataFrame()
     files = get_files('merge_data_')
-    # filter_by = ['hikey970', 'linux', 'mg', 'b', 8]
     filter_by = combinations()
     for cbn in filter_by:
         group = pd.DataFrame()
         for file in files:
             index = int(file[-6:-4])
             df = pd.read_csv(file)
-            file_data = df[df['device'] == cbn[0]][df['os'] == cbn[1]][df['benchmark'] == cbn[2]][df['size'] == cbn[3]][df['threads'] == cbn[4]]
-            file_data['file-number'] = index
-            group = group.append(file_data, sort=False)
-            # df_groups = df.groupby(['device', 'os', 'benchmark', 'size', 'threads'])
-
+            df = df[df['device'] == cbn[0]][df['os'] == cbn[1]][df['benchmark'] == cbn[2]][df['size'] == cbn[3]][df['threads'] == cbn[4]]
+            df['file-number'] = index
+            group = group.append(df, sort=False)
         group.reset_index(drop=True, inplace=True)
         group.index += 1
         group['old-iteration'] = group['iteration']
         group['iteration'] = group.index
-        group.to_csv(path_or_buf=f'{options.directory}/{cbn[0]}_{cbn[1]}_{cbn[2]}_{cbn[3]}_{cbn[4]}.csv', index=False)
+        data = data.append(group, sort=False)
+    data = clean_data(data)
+    data.to_csv(path_or_buf=f'{options.directory}/merge_data.csv', index=False)
 
 
 if __name__ == "__main__":
