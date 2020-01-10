@@ -5,7 +5,7 @@ from optparse import OptionParser
 
 import pandas as pd
 
-from common import log_to_file, profile, HIKEY970, ROCK960
+from common import log_to_file, profile, HIKEY970, ROCK960, ODROIDXU4
 from data_csv_process import get_files
 from stats import clean_data
 
@@ -24,7 +24,7 @@ def parse_args(logger):
 
 
 def combinations():
-    devices = [HIKEY970, 'odroidxu4', ROCK960]
+    devices = [HIKEY970, ODROIDXU4, ROCK960]
     oss = ['linux', 'android']
     benchmarks = ['bt', 'is', 'mg']
     sizes = ['b', 'w']
@@ -46,7 +46,7 @@ def combinations():
         filters.remove(item)
     # Remove combinations of device and threads that we don't have
     remove = []
-    for pair in [[HIKEY970, 6], [ROCK960, 8], ['odroidxu4', 6]]:
+    for pair in [[HIKEY970, 6], [ROCK960, 8], [ODROIDXU4, 6]]:
         for item in filters:
             if pair[0] == item[0] and pair[1] == item[4]:
                 remove.append(item)

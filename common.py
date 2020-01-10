@@ -42,6 +42,7 @@ PD_DTYPE = {IDs.TIME_NPB: str, IDs.MOPS: str, IDs.ENERGY: str, IDs.TIME: str}
 
 # Devices used in testing
 HIKEY970 = 'hikey970'
+ODROIDXU4 = 'odroidxu4'
 ODROIDXU4_A = 'odroidxu4a'
 ODROIDXU4_B = 'odroidxu4b'
 ROCK960 = 'rock960'
