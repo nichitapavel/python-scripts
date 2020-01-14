@@ -42,7 +42,6 @@ def clean_data(df, warmup):
     # Remove data that has a more than 1% difference between npb reported time and
     # time calculated from power metric files
     df = df[df['time_npb'] / df['time'] > 0.99]
-
     for item in ResultItems:
         df = df[df[item] != 0]
     return df
