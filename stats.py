@@ -18,7 +18,7 @@ def parse_args(logger):
     parser = OptionParser('usage: python %prog [OPTIONS]')
     parser.add_option("--df", "--data-file", action="store", type="string", dest="data_file")
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")
-    parser.add_option("--skip-warmup", action="store", type="int", dest="skip_warmup", default=0)
+    parser.add_option("--skip-warm-up", action="store", type="int", dest="skip_warm_up", default=0)
     parser.add_option("--only-stats", action="store_true", dest="only_stats")
     (options, args) = parser.parse_args()
     if not options.data_file or \
@@ -30,15 +30,16 @@ def parse_args(logger):
     return options
 
 
-def clean_data(df, warmup):
+def clean_data(df, warm_up=0):
     """
     Clean data from Null (empty) or 0.0 values, also remove values with bigger
     than 1% difference between 'time_npb' and 'time'
+    :param warm_up: remove first warmup iterations, default 0
     :param df: DataFrame read with panda from a csv (usually and in my case)
     :return: DataFrame without Null (empty) or 0.0 values
     """
     df = df.dropna()
-    df = df[df[IDs.ITERATION] > warmup]  # Remove the warmup = first X iterations
+    df = df[df[IDs.ITERATION] > warm_up]  # Remove the warmup = first X iterations
     # Remove data that has a more than 1% difference between npb reported time and
     # time calculated from power metric files
     df = df[df['time_npb'] / df['time'] > 0.99]
@@ -214,7 +215,7 @@ def main():
     cwd = os.getcwd()
 
     df = pd.read_csv(options.data_file)
-    df = clean_data(df, options.skip_warmup)
+    df = clean_data(df, options.skip_warm_up)
     stats = create_and_write_stats(df)
 
     if not options.only_stats:
