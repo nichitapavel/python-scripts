@@ -5,12 +5,42 @@ import os
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 
+import numpy
+import pandas as pd
+
 from common import read_timestamp, CSV_TIME, CSV_POWER, CSV_OP, check_last_row, \
     first_timestamp, csv_name_parsing, log_to_file, profile, write_csv_dict_with_lists, \
     write_csv_list_of_dict, parse_args, sort_list_of_dict
 from plotters import power_plot
 
 logger = logging.getLogger('TRANSFORM_CSV')
+
+
+def pd_csv_process(file):
+    df = pd.read_csv(file, dtype={'Time': numpy.str_, 'Power(mWatt)': numpy.float64, 'Operation': numpy.str_})
+    ts_xs = df.loc[df[CSV_OP] == 'XS']
+    ts_xf = df.loc[df[CSV_OP] == 'XF']
+    energy = 0
+    time_us = 0
+    if len(ts_xs.index) == 1 and len(ts_xf.index) == 1:
+        df_range = df.take(range(ts_xs.index.values[0], ts_xf.index.values[0]+1))
+        values = df_range.values
+        for i in range(1, len(values)):
+            value_now = values[i]
+            value_prev = values[i-1]
+            ts_prev = read_timestamp(value_prev[0])
+            ts_now = read_timestamp(value_now[0])
+            power_prev = value_prev[1]
+            power_now = value_now[1]
+            us = (ts_now - ts_prev).microseconds
+            time_us += us
+            energy += calculate_energy(power_now, power_prev, us)
+        ts_xs = read_timestamp(ts_xs.iat[0, 0])
+        ts_xf = read_timestamp(ts_xf.iat[0, 0])
+        time_s = (ts_xf - ts_xs).total_seconds()
+        if (time_us / 1000000) != time_s:
+            return None
+    return ts_xs, ts_xf, energy / 1000000000, time_s
 
 
 def csv_shortcuts(data):
