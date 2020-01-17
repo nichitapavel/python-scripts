@@ -10,6 +10,8 @@ from common import read_timestamp, CSV_TIME, CSV_POWER, CSV_OP, check_last_row, 
     write_csv_list_of_dict, parse_args, sort_list_of_dict
 from plotters import power_plot
 
+logger = logging.getLogger('TRANSFORM_CSV')
+
 
 def csv_shortcuts(data):
     data_time = data.get('time')
@@ -201,7 +203,6 @@ def main():
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger('TRANSFORM_CSV')
     with Manager() as manager:
         mem = manager.list()
         profile(mem, 'global', main)
