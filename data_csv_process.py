@@ -23,8 +23,8 @@ def pd_csv_process(file):
     energy = 0
     time_us = 0
     if len(ts_xs.index) == 1 and len(ts_xf.index) == 1:
-        df_range = df.take(range(ts_xs.index.values[0], ts_xf.index.values[0]+1))
-        values = df_range.values
+        df_range = df.loc[ts_xs.index.to_numpy()[0]:ts_xf.index.to_numpy()[0]]
+        values = df_range.to_numpy()
         for i in range(1, len(values)):
             value_now = values[i]
             value_prev = values[i-1]
