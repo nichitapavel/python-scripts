@@ -135,7 +135,10 @@ def test_pd_csv_process_benchmark(request, benchmark):
     warmup=False
 )
 def test_csv_process_benchmark(request, benchmark):
-    df = pd.read_csv(f'{request.config.rootdir}/{TEST_RESOURCES}/{XL_FILE}')
+    df = pd.read_csv(
+        f'{request.config.rootdir}/{TEST_RESOURCES}/{XL_FILE}',
+        dtype={TIME: numpy.str_, POWER: numpy.float64, OPERATION: numpy.str_}
+    )
     file = open(f'{request.config.rootdir}/{TEST_RESOURCES}/{XL_FILE}')
     ts_first = read_timestamp(df.values[0][0])
     ts_xs = None
