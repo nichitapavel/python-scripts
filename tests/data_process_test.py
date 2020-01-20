@@ -6,7 +6,7 @@ import numpy
 import pandas as pd
 import pytest
 
-from common import read_timestamp
+from common import read_timestamp, TIME, POWER, OPERATION
 from data_csv_process import pd_csv_process, csv_process
 
 TEST_RESOURCES = 'tests/resources'

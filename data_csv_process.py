@@ -10,14 +10,14 @@ import pandas as pd
 
 from common import read_timestamp, CSV_TIME, CSV_POWER, CSV_OP, check_last_row, \
     first_timestamp, csv_name_parsing, log_to_file, profile, write_csv_dict_with_lists, \
-    write_csv_list_of_dict, parse_args, sort_list_of_dict
+    write_csv_list_of_dict, parse_args, sort_list_of_dict, TIME, POWER, OPERATION
 from plotters import power_plot
 
 logger = logging.getLogger('TRANSFORM_CSV')
 
 
 def pd_csv_process(file):
-    df = pd.read_csv(file, dtype={'Time': numpy.str_, 'Power(mWatt)': numpy.float64, 'Operation': numpy.str_})
+    df = pd.read_csv(file, dtype={TIME: numpy.str_, POWER: numpy.float64, OPERATION: numpy.str_})
     ts_xs = df.loc[df[CSV_OP] == 'XS']
     ts_xf = df.loc[df[CSV_OP] == 'XF']
     energy = 0

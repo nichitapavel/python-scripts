@@ -64,6 +64,12 @@ CSV_OP = 'Operation'
 CORES = multiprocessing.cpu_count()
 
 
+# Data files columns
+POWER ='Power(mWatt)'
+OPERATION = 'Operation'
+TIME = 'Time'
+
+
 # Files naming scheme:
 # [<type>_]XXXXXXXXX_<device>_<os>_<bench>_<class>_<threads>[_<iteration>].<suffix>
 # Where XXXXXXXXX is whatever, it must not contain '_' char
