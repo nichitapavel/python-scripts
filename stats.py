@@ -266,6 +266,7 @@ def main():
     df = ''
     if options.directory_with_files:
         df = json_to_csv(options.directory_with_files)
+        df.to_csv(path_or_buf=f'{options.save_directory}/json_data.csv', index=False)
     else:
         df = pd.read_csv(options.data_file)
         df = clean_data(df, options.skip_warm_up)
