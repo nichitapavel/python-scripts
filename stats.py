@@ -140,7 +140,17 @@ def boxplot_for_parallel(cwd, group, options, x_axis_groupby):
             dicts[i][j] = group[1][group[1][x_axis_groupby] == j][i].values.tolist()
     for keys, values in dicts.items():
         name = f'{x_axis_groupby}_{"_".join(str(x) for x in group[0])}'
-        box_plot(cwd, name, keys, values)
+
+        # Hack for jeml
+        y_axis = ''
+        if keys == IDs.TIME:
+            y_axis = 'Time (seconds)'
+        elif keys == IDs.ENERGY:
+            y_axis = 'Energy (joules)'
+        else:
+            y_axis = keys
+
+        box_plot(cwd, name, y_axis, values)
         logger.info(f'[{options.data_file}][BOXPLOT][{name}]')
         plt.close()
 

@@ -194,7 +194,7 @@ def power_plot(filename, x_axis, y_axis, marks):
 def box_plot(path, filename, label, data):
     config = {
         CfgLabel.ylabel: label,
-        CfgLabel.xlabel: '# Hilos',
+        CfgLabel.xlabel: '# Threads',
         CfgLabel.title: f'Variation of {label}',
         CfgLabel.aspect_ratio: 1.0,
         CfgLabel.dpi: 100,
