@@ -20,11 +20,17 @@ def parse_args(logger):
     parser.add_option("--sd", "--save-directory", action="store", type="string", dest="save_directory")
     parser.add_option("--skip-warm-up", action="store", type="int", dest="skip_warm_up", default=0)
     parser.add_option("--only-stats", action="store_true", dest="only_stats")
+    parser.add_option("--jeml", action="store", type='string', dest="directory_with_files")
     (options, args) = parser.parse_args()
-    if not options.data_file or \
-            not options.save_directory:
+    if not options.data_file and \
+            not options.directory_with_files:
         # This logger line will not be saved to file
-        logger.error('[You must specify files and a directory to save]')
+        logger.error('[You must specify files or where to read jeml jsons]')
+        parser.print_help()
+        sys.exit(-1)
+    if not options.save_directory:
+        # This logger line will not be saved to file
+        logger.error('[You must specify a directory to save]')
         parser.print_help()
         sys.exit(-1)
     return options
@@ -182,7 +188,8 @@ def update_dict(stats, data_dict, type_of_data):
 
 def create_and_write_stats(df):
     df_groups = df.groupby(DataFilterItems)
-    stats_results = {IDs.TIME: [], IDs.TIME_NPB: [], IDs.ENERGY: [], IDs.MOPS: []}
+    # stats_results = {IDs.TIME: [], IDs.TIME_NPB: [], IDs.ENERGY: [], IDs.MOPS: []}
+    stats_results = {IDs.TIME: [], IDs.ENERGY: []}
     for group in df_groups:
         data_dict = {
             IDs.TYPE: group[0][0],
@@ -208,42 +215,88 @@ def create_and_write_stats(df):
     return stats_results
 
 
+def json_to_csv(path: str):
+    curdir = os.getcwd()
+    print(curdir)
+    os.chdir(path)
+    pd_columns = [IDs.TYPE, IDs.DEVICE, IDs.OS, IDs.BENCH, IDs.SIZE, IDs.THREADS, IDs.ITERATION, IDs.TIME, IDs.ENERGY]
+    pandas_datas_mother_fakers = pd.DataFrame(columns=pd_columns)
+    for item in os.listdir():
+        if os.path.isdir(item):
+            for json_file in os.listdir(item):
+                if json_file.endswith('.json'):
+                    json_file_path = f'{os.curdir}/{item}/{json_file}'
+                    json = pd.read_json(json_file_path)
+                    data = json['Values'][0]['Values'][0]['Title']
+                    data_dict = {
+                        IDs.TYPE: data.split(':')[1].split()[0].lower(),
+                        IDs.DEVICE: data.split(':')[0].lower(),
+                        IDs.OS: 'linux',
+                        IDs.BENCH: data.split(':')[1].split()[1].lower(),
+                        IDs.SIZE: data.split(':')[1].split()[3].lower(),
+                        IDs.THREADS: int(data.split(':')[1].split()[5].lower())
+                    }
+                    values_joules = ''
+                    values_time = ''
+                    for section in json['Values'][0]['Values'][0]['Values']:
+                        if section['Title'] == 'Window EML Total Energy':
+                            values_joules = section
+                        if section['Title'] == 'Window Execution Time':
+                            values_time = section
+                    data_list = []
+                    for i in range(0, len(values_time['Values'])):
+                        new_data_dict = data_dict.copy()
+                        new_data_dict[IDs.ITERATION] = i
+                        new_data_dict[IDs.TIME] = values_time['Values'][i] * pow(10, -9)
+                        new_data_dict[IDs.ENERGY] = values_joules['Values'][i]
+                        data_list.append(new_data_dict)
+                    pd_data = pd.DataFrame(columns=pd_columns, data=data_list)
+                    pandas_datas_mother_fakers = pandas_datas_mother_fakers.append(other=pd_data)
+    os.chdir(curdir)
+    pandas_datas_mother_fakers.reset_index(drop=True, inplace=True)
+    return pandas_datas_mother_fakers
+
+
 def main():
     options = parse_args(logger)
     os.chdir(options.save_directory)
     logger.addHandler(log_to_file('stats.log'))
     cwd = os.getcwd()
 
-    df = pd.read_csv(options.data_file)
-    df = clean_data(df, options.skip_warm_up)
+    df = ''
+    if options.directory_with_files:
+        df = json_to_csv(options.directory_with_files)
+    else:
+        df = pd.read_csv(options.data_file)
+        df = clean_data(df, options.skip_warm_up)
     stats = create_and_write_stats(df)
 
     if not options.only_stats:
         box_plotting(cwd, df, options, x_axis_groupby=IDs.THREADS)
-        box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
-        box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
-        box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
+        # box_plotting(cwd, df, options, x_axis_groupby=IDs.OS)
+        # box_plotting(cwd, df, options, x_axis_groupby=IDs.DEVICE)
+        # box_plotting(cwd, df, options, x_axis_groupby=IDs.TYPE)
         logger.info(f'[{options.data_file}]')
 
-        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
-        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
-        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
-        box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
-
-        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
-        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
-        box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
-
-        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
-        box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
-
-        box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
-
-        for resultItem in ResultItems:
-            pd_stats = pd.DataFrame(stats[resultItem])
-            cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
-            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
-            cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
+        # box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.THREADS])
+        # box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.BENCH])
+        # box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.TYPE])
+        # box_plotting_groups(cwd, df, options, [IDs.DEVICE, IDs.OS])
+        #
+        # box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.BENCH])
+        # box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.TYPE])
+        # box_plotting_groups(cwd, df, options, [IDs.THREADS, IDs.OS])
+        #
+        # box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.TYPE])
+        # box_plotting_groups(cwd, df, options, [IDs.BENCH, IDs.OS])
+        #
+        # box_plotting_groups(cwd, df, options, [IDs.TYPE, IDs.OS])
+        #
+        # for resultItem in ResultItems:
+        #     pd_stats = pd.DataFrame(stats[resultItem])
+        #     cat_plotting(cwd, pd_stats, options, IDs.THREADS, resultItem)
+        #     cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.OS], resultItem)
+        #     cat_plotting_group(cwd, pd_stats, options, [IDs.THREADS, IDs.TYPE], resultItem)
 
     # df = sns.load_dataset('tips')
     # sns.boxplot(x = "day", y = "total_bill", hue = "smoker", data = df, palette = "Set1")
@@ -252,6 +305,7 @@ def main():
 if __name__ == "__main__":
     logger = logging.getLogger('STATS_CSV')
     pd.options.display.width = 0
+    ResultItems = [IDs.TIME, IDs.ENERGY]
     mem = []
     profile(mem, 'test', main,)
 
