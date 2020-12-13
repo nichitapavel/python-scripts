@@ -239,7 +239,8 @@ def json_to_csv(path: str):
                     json = pd.read_json(json_file_path)
                     data = json['Values'][0]['Values'][0]['Title']
                     data_dict = {
-                        IDs.TYPE: data.split(':')[1].split()[0].lower(),
+                        # IDs.TYPE: data.split(':')[1].split()[0].lower(),
+                        IDs.TYPE: json_file.split('_')[2].lower(),
                         IDs.DEVICE: data.split(':')[0].lower(),
                         IDs.OS: 'linux',
                         IDs.BENCH: data.split(':')[1].split()[1].lower(),
